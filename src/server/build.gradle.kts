@@ -19,5 +19,13 @@ java {
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
+    implementation("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+
+    implementation("org.hibernate:hibernate-core:6.6.11.Final")
+    implementation("org.hibernate.orm:hibernate-hikaricp:6.6.11.Final")
+    implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
+
+    implementation("org.jetbrains:annotations:24.1.0")
+    implementation("com.google.code.gson:gson:2.11.0")
 }
