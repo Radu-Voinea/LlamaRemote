@@ -16,15 +16,10 @@ import java.util.HashMap;
 @Getter
 public class DatabaseManager {
 
-	@Getter
-	@Accessors(fluent = true)
-	private static DatabaseManager instance;
-
 	private SessionFactory sessionFactory;
 
 	public DatabaseManager(@NotNull DatabaseConfig config) {
 		connect(config);
-		instance = this;
 	}
 
 	public void connect(DatabaseConfig config) {
