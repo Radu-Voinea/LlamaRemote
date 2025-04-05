@@ -6,7 +6,9 @@ import com.google.gson.GsonBuilder;
 import com.raduvoinea.utils.file_manager.FileManager;
 import com.raduvoinea.utils.generic.dto.Holder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
+@Configuration
 public class BeanProvider {
 
 	@Bean

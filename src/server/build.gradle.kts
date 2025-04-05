@@ -20,6 +20,8 @@ java {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.projectlombok:lombok")
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    annotationProcessor("org.projectlombok:lombok")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 
     implementation("org.hibernate:hibernate-core:6.6.11.Final")
