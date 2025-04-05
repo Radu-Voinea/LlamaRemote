@@ -15,13 +15,6 @@ import java.util.HashMap;
 @RestController
 public class AuthRestAPI {
 
-	private final DatabaseManager databaseManager;
-	private final HashMap<String, User> authenticatedUsers = new HashMap<>();
-
-	public AuthRestAPI(DatabaseManager databaseManager) {
-		this.databaseManager = databaseManager;
-	}
-
 	@PostMapping("/auth")
 	public ResponseEntity<AuthRequest.Response> auth(@RequestBody AuthRequest body) {
 		User user = User.getByUsername(body.username);

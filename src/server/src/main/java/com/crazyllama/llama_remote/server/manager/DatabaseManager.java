@@ -4,8 +4,7 @@ import com.crazyllama.llama_remote.server.dto.DatabaseConfig;
 import com.crazyllama.llama_remote.server.dto.database.Host;
 import com.crazyllama.llama_remote.server.dto.database.User;
 import com.crazyllama.llama_remote.server.dto.database.Workspace;
-import com.crazyllama.llama_remote.server.dto.database.WorkspaceUser;
-import jakarta.persistence.Entity;
+import com.crazyllama.llama_remote.server.dto.database.WorkspacePermission;
 import lombok.Getter;
 import lombok.experimental.Accessors;
 import org.hibernate.SessionFactory;
@@ -13,9 +12,6 @@ import org.hibernate.cfg.Configuration;
 import org.hibernate.cfg.JdbcSettings;
 import org.hibernate.cfg.SchemaToolingSettings;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.HashMap;
 
 @Getter
 public class DatabaseManager {
@@ -39,7 +35,7 @@ public class DatabaseManager {
 		configuration.addAnnotatedClass(Host.class);
 		configuration.addAnnotatedClass(User.class);
 		configuration.addAnnotatedClass(Workspace.class);
-		configuration.addAnnotatedClass(WorkspaceUser.class);
+		configuration.addAnnotatedClass(WorkspacePermission.class);
 
 		configuration.setProperty(JdbcSettings.CONNECTION_PROVIDER, "org.hibernate.hikaricp.internal.HikariCPConnectionProvider");
 		configuration.setProperty("hibernate.hikari.jdbcUrl", config.getConnectionURL());
