@@ -4,6 +4,7 @@ import com.crazyllama.llama_remote.server.dto.database.User;
 import com.crazyllama.llama_remote.server.dto.database.Workspace;
 import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceCreateRequest;
 import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceListRequest;
+import com.crazyllama.llama_remote.server.dto.database.WorkspaceUser;
 import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-@RestController(value = "/workspace")
+@RestController
 public class WorkspaceRestAPI {
 
 	private final DatabaseManager databaseManager;
@@ -23,7 +24,7 @@ public class WorkspaceRestAPI {
 		this.databaseManager = databaseManager;
 	}
 
-	@GetMapping("/list")
+	@GetMapping("/workspace/list")
 	public ResponseEntity<WorkspaceListRequest.Response> list(@RequestBody WorkspaceListRequest body) {
 		User user = User.getByToken(body.token);
 
@@ -42,7 +43,7 @@ public class WorkspaceRestAPI {
 		);
 	}
 
-	@GetMapping("/create")
+	@GetMapping("/workspace/create")
 	public ResponseEntity<WorkspaceCreateRequest.Response> create(@RequestBody WorkspaceCreateRequest body) {
 		User user = User.getByToken(body.token);
 
@@ -52,6 +53,10 @@ public class WorkspaceRestAPI {
 		}
 
 		Workspace workspace = new Workspace(body.name);
+		workspace.save();
+
+		WorkspaceUser workspaceUser = new WorkspaceUser(workspace, user);
+		workspaceUser.save();
 
 		return ResponseEntity.ok(
 				new WorkspaceCreateRequest.Response(
