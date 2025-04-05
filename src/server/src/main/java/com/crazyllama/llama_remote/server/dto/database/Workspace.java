@@ -40,6 +40,16 @@ public class Workspace implements IDatabaseEntry<Long> {
 		}
 	}
 
+	public static Workspace getById(long id) {
+		try (Session session = DatabaseManager.instance().getSessionFactory().openSession()) {
+			return session.createQuery("from workspaces w where w.id = :id", Workspace.class)
+					.setParameter("id", id)
+					.getSingleResult();
+		} catch (Exception exception) {
+			return null;
+		}
+	}
+
 	@Override
 	public Long getIdentifier() {
 		return id;

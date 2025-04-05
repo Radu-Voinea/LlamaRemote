@@ -5,11 +5,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
 public class WorkspaceListRequest {
-
-	public String token;
 
 	@AllArgsConstructor
 	@NoArgsConstructor
