@@ -15,6 +15,7 @@ public class BeanProvider {
 	public Gson gson() {
 		return new GsonBuilder()
 				.disableHtmlEscaping()
+				.setPrettyPrinting()
 				.create();
 	}
 

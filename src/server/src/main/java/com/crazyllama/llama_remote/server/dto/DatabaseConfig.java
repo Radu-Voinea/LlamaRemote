@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class DatabaseConfig {
 
-	public String connectionURL = "jdbc:mariadb://mariadb:3306/core";
+	public String connectionURL = "jdbc:mariadb://localhost:8086/llama_remote";
 	public String username = "username";
 	public String password = "password";
 	public String driver = "org.mariadb.jdbc.Driver";

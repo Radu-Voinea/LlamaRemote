@@ -18,16 +18,32 @@ java {
 }
 
 dependencies {
-    implementation("org.springframework.boot:spring-boot-starter")
+    // Spring
+    implementation("org.springframework.boot:spring-boot-starter"){
+        exclude(group = "org.hibernate", module = "hibernate-core")
+    }
+    implementation("org.springframework.boot:spring-boot-starter-web"){
+        exclude(group = "org.hibernate", module = "hibernate-core")
+    }
+
+    // Annotations
     implementation("org.projectlombok:lombok")
-    implementation("org.springframework.boot:spring-boot-starter-web")
     annotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
-
-    implementation("org.hibernate:hibernate-core:6.6.11.Final")
-    implementation("org.hibernate.orm:hibernate-hikaricp:6.6.11.Final")
-    implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
-
     implementation("org.jetbrains:annotations:24.1.0")
+    annotationProcessor("org.jetbrains:annotations:24.1.0")
+
+    // Database
+    implementation("org.hibernate:hibernate-core:6.4.4.Final")
+    implementation("org.hibernate.orm:hibernate-hikaricp:6.4.4.Final")
+    implementation("org.hibernate.validator:hibernate-validator:8.0.2.Final")
+    implementation("org.mariadb.jdbc:mariadb-java-client:3.5.2")
+
+    implementation("jakarta.el:jakarta.el-api:6.0.1")
+    implementation("jakarta.inject:jakarta.inject-api:2.0.1")
+    implementation("com.mchange:c3p0:0.10.2")
+    implementation("aopalliance:aopalliance:1.0")
+    implementation("org.osgi:org.osgi.framework:1.10.0")
+
+    // Utils
     implementation("com.google.code.gson:gson:2.11.0")
 }

@@ -33,7 +33,7 @@ public class RestAPI {
 			authenticatedUsers.put(token, user);
 			return new Auth.Response("OK", token);
 		} catch (HibernateException e) {
-			throw new RuntimeException(e);
+			return new Auth.Response("Invalid credentials", "");
 		}
 	}
 
