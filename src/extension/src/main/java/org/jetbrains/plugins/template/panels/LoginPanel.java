@@ -14,7 +14,7 @@ import java.awt.event.ActionEvent;
 public class LoginPanel extends JPanel {
 	private final JTextField emailField;
 	private final JTextField serverField;
-	private final JLabel errorLabel;
+	private final JLabel replyLabel;
 	private final JPasswordField passwordField;
 
 	public LoginPanel() {
@@ -64,10 +64,9 @@ public class LoginPanel extends JPanel {
 		gbc.gridy++;
 		gbc.gridx = 0;
 		gbc.gridwidth = 2;
-		errorLabel = new JLabel();
-		errorLabel.setVisible(false);
-		errorLabel.setForeground(JBColor.RED);
-		LOGIN_PANEL.add(errorLabel, gbc);
+		replyLabel = new JLabel();
+		replyLabel.setVisible(false);
+		LOGIN_PANEL.add(replyLabel, gbc);
 
 		gbc.gridy++;
 		gbc.gridx = 0;
@@ -100,14 +99,16 @@ public class LoginPanel extends JPanel {
 		AuthRequest.Response response = new APIRequest<>("/auth", "POST", authRequest, AuthRequest.Response.class)
 				.getResponse();
 
-		errorLabel.setVisible(true);
+		replyLabel.setVisible(true);
 		if (response.token == null || response.token.isEmpty()) {
-			errorLabel.setText(response.response);
+			replyLabel.setForeground(JBColor.RED);
+			replyLabel.setText(response.response);
 			return;
 		}
 
 		// TODO: Go to next UI
-		errorLabel.setText("Login successful");
+		replyLabel.setForeground(JBColor.GREEN);
+		replyLabel.setText("Login successful");
 	}
 
 	private void signInButtonPressed(ActionEvent e) {
@@ -123,12 +124,14 @@ public class LoginPanel extends JPanel {
 		AuthRequest.Response response = new APIRequest<>("/register", "POST", authRequest, AuthRequest.Response.class)
 				.getResponse();
 
-		errorLabel.setVisible(true);
+		replyLabel.setVisible(true);
 		if (response.token == null || response.token.isEmpty()) {
-			errorLabel.setText(response.response);
+			replyLabel.setForeground(JBColor.RED);
+			replyLabel.setText(response.response);
 			return;
 		}
 
-		errorLabel.setText("Sign in successful");
+		replyLabel.setForeground(JBColor.GREEN);
+		replyLabel.setText("Sign in successful");
 	}
 }
