@@ -1,9 +1,10 @@
 package com.crazyllama.llama_remote.server.manager.rest;
 
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceCreateRequest;
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceInfoRequest;
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceListRequest;
 import com.crazyllama.llama_remote.server.dto.database.User;
 import com.crazyllama.llama_remote.server.dto.database.Workspace;
-import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceCreateRequest;
-import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceListRequest;
 import com.crazyllama.llama_remote.server.dto.database.WorkspaceUser;
 import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import org.springframework.http.ResponseEntity;
@@ -74,6 +75,37 @@ public class WorkspaceRestAPI {
 
 		return ResponseEntity.ok(
 				new WorkspaceCreateRequest.Response("OK")
+		);
+	}
+
+
+	@GetMapping("/workspace/{id}")
+	public ResponseEntity<WorkspaceInfoRequest.Response> create(
+			@RequestHeader("Authorization") String authHeader,
+			@PathVariable("id") int id
+	) {
+		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+			return ResponseEntity.status(401)
+					.body(new WorkspaceInfoRequest.Response("Unauthorised", ""));
+		}
+
+		String token = authHeader.substring(7);
+		User user = User.getByToken(token);
+
+		if (user == null) {
+			return ResponseEntity.status(401)
+					.body(new WorkspaceInfoRequest.Response("Unauthorised", ""));
+		}
+
+		Workspace workspace = Workspace.getById(id);
+
+		if (workspace == null) {
+			return ResponseEntity.status(404)
+					.body(new WorkspaceInfoRequest.Response("Workspace not found", ""));
+		}
+
+		return ResponseEntity.ok(
+				new WorkspaceInfoRequest.Response("OK", workspace.name)
 		);
 	}
 
