@@ -9,7 +9,6 @@ import java.util.List;
 @NoArgsConstructor
 public class WorkspaceCreateRequest {
 
-	public String token;
 	public String name;
 
 	@AllArgsConstructor

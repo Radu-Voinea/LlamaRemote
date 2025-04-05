@@ -11,6 +11,8 @@ import org.jetbrains.plugins.template.services.MyProjectService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class MyToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFactory {
 
@@ -29,17 +31,37 @@ public class MyToolWindowFactory implements com.intellij.openapi.wm.ToolWindowFa
     private static class MyToolWindow {
 
         private final MyProjectService service;
+        private final WorkspacesPanel workspacesPanel;
 
         public MyToolWindow(ToolWindow toolWindow) {
             this.service = ServiceManager.getService(toolWindow.getProject(), MyProjectService.class);
+            this.workspacesPanel = new WorkspacesPanel();
         }
 
         public JComponent getContent() {
-            JPanel panel = new JPanel(new BorderLayout());
+            JPanel mainPanel = new JPanel(new BorderLayout());
 
-            panel.add(new WorkspacesPanel(), BorderLayout.CENTER);
+            // Create refresh button
+            JButton refreshButton = new JButton("Refresh");
+            refreshButton.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    // Your refresh logic here
+                    // For example: workspacesPanel.reload(); if you have such a method
+                    System.out.println("Refresh button clicked");
 
-            return panel;
+                    // Example of clearing and reloading the panel
+                    workspacesPanel.refresh(); // You need to implement this in WorkspacesPanel
+                }
+            });
+
+            JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+            topPanel.add(refreshButton);
+
+            mainPanel.add(topPanel, BorderLayout.NORTH);
+            mainPanel.add(workspacesPanel, BorderLayout.CENTER);
+
+            return mainPanel;
         }
     }
 }

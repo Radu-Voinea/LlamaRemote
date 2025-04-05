@@ -1,5 +1,7 @@
 package org.jetbrains.plugins.template.api;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.template.MyBundle;
 import org.jetbrains.plugins.template.Registry;
 
@@ -12,13 +14,22 @@ public class APIRequest<RequestBody, ResponseBody> {
 	private final HttpRequest httpRequest;
 	private final Class<ResponseBody> responseClass;
 
-	public APIRequest(String path, RequestBody requestBody, Class<ResponseBody> responseClass) {
-		this.httpRequest = HttpRequest.newBuilder()
+	public APIRequest(@NotNull String path, @NotNull String method, @Nullable RequestBody requestBody, @NotNull Class<ResponseBody> responseClass) {
+		HttpRequest.Builder builder = HttpRequest.newBuilder()
 				.uri(Registry.createURI(path))
-				.header("Content-Type", "application/json")
-				.method("GET", HttpRequest.BodyPublishers.ofString(MyBundle.instance().getGson().toJson(requestBody)))
-				.build();
+				.header("Content-Type", "application/json");
 
+		if (Registry.token != null) {
+			builder = builder.header("Authorization", "Bearer " + Registry.token);
+		}
+
+		if (requestBody != null) {
+			builder = builder.method(method, HttpRequest.BodyPublishers.ofString(MyBundle.instance().getGson().toJson(requestBody)));
+		} else {
+			builder = builder.method(method, HttpRequest.BodyPublishers.noBody());
+		}
+
+		this.httpRequest = builder.build();
 		this.responseClass = responseClass;
 	}
 

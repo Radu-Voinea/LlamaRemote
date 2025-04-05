@@ -8,24 +8,30 @@ import java.awt.event.ActionEvent;
 
 public class WorkspacesPanel extends JScrollPane {
 
+	private final JPanel contentPanel;
+
 	public WorkspacesPanel() {
 		super(null,
 				JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
 				JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 
-		JPanel panel = new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		this.contentPanel = new JPanel();
+		this.contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
-//		JLabel dockerLabel = new JLabel("Docker");
-//		dockerLabel.setFont(dockerLabel.getFont().deriveFont(Font.BOLD, 16f));
-//		dockerLabel.setBorder(BorderFactory.createEmptyBorder(10, 5, 10, 0));
-//		panel.add(dockerLabel);
+		this.setViewportView(contentPanel);
+		buildUI();
+	}
+
+	private void buildUI() {
+		contentPanel.removeAll(); // Clear previous content
 
 		System.out.println("Workspaces: " + WorkspaceAPI.getWorkspaces());
-		System.out.println(WorkspaceAPI.getWorkspaces());
 
-		addExpandableSection(panel, "Docker-compose: llama_remote_dev", new String[]{"service-a", "service-b"});
-		addExpandableSection(panel, "Docker-compose: local", new String[]{"web", "db"});
+		for (Integer workspaceID : WorkspaceAPI.getWorkspaces()) {
+			String workspaceName = WorkspaceAPI.getWorkspaceName(workspaceID);
+
+			addExpandableSection(contentPanel, workspaceName, new String[]{"service-a", "service-b"});
+		}
 
 		String[] staticEntries = {
 				"Dev Containers", "Containers", "Images", "Networks", "Volumes", "Kubernetes"
@@ -33,10 +39,15 @@ public class WorkspacesPanel extends JScrollPane {
 		for (String entry : staticEntries) {
 			JButton button = createEntryButton(entry);
 			button.setBorder(BorderFactory.createEmptyBorder(1, 25, 1, 0));
-			panel.add(button);
+			contentPanel.add(button);
 		}
 
-		this.setViewportView(panel);
+		contentPanel.revalidate();
+		contentPanel.repaint();
+	}
+
+	public void refresh() {
+		buildUI();
 	}
 
 	private void addExpandableSection(JPanel parent, String title, String[] items) {

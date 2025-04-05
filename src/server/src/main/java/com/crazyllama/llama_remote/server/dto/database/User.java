@@ -43,7 +43,7 @@ public class User implements IDatabaseEntry<String> {
 		String characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 		StringBuilder tokenBuilder = new StringBuilder();
 
-		for (int i = 0; i < 128; i++) {
+		for (int i = 0; i < 64; i++) {
 			int index = (int) (Math.random() * characters.length());
 			tokenBuilder.append(characters.charAt(index));
 		}
