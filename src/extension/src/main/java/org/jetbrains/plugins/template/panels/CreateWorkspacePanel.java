@@ -1,9 +1,15 @@
 package org.jetbrains.plugins.template.panels;
 
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceCreateRequest;
+import org.jetbrains.plugins.template.api.APIRequest;
+import org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class CreateWorkspacePanel extends JPanel {
+	private final JTextField nameField;
 
 	public CreateWorkspacePanel() {
 		super(new BorderLayout());
@@ -28,7 +34,7 @@ public class CreateWorkspacePanel extends JPanel {
 		nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		workspacePanel.add(nameLabel);
 
-		JTextField nameField = new JTextField();
+		nameField = new JTextField();
 		nameField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		Dimension namePrefSize = nameField.getPreferredSize();
 		// Se întinde pe toată lățimea disponibilă, păstrând înălțimea preferată
@@ -41,8 +47,33 @@ public class CreateWorkspacePanel extends JPanel {
 
 		// Adăugăm butonul "Save" în partea de jos
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
 		JButton saveButton = new JButton("Save");
+		saveButton.addActionListener(this::saveButtonPressed);
+
+		JButton cancelButton = new JButton("Cancel");
+		saveButton.addActionListener(this::cancelButtonPressed);
+
+		buttonPanel.add(cancelButton);
 		buttonPanel.add(saveButton);
+
 		this.add(buttonPanel, BorderLayout.SOUTH);
 	}
+
+	private void cancelButtonPressed(ActionEvent e) {
+		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
+	}
+
+	private void saveButtonPressed(ActionEvent e) {
+		String name = nameField.getText();
+		WorkspaceCreateRequest request = new WorkspaceCreateRequest(name);
+
+		WorkspaceCreateRequest.Response response = new APIRequest<>("/workspace/create", "POST",
+				request, WorkspaceCreateRequest.Response.class)
+				.getResponse();
+
+		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
+	}
+
+
 }
