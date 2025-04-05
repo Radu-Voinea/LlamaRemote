@@ -1,5 +1,9 @@
 package org.jetbrains.plugins.template.panels;
 
+import com.crazyllama.llama_remote.common.dto.rest.host.HostInfoRequest;
+import com.crazyllama.llama_remote.common.dto.rest.host.HostsListRequest;
+import com.raduvoinea.utils.message_builder.MessageBuilder;
+import org.jetbrains.plugins.template.api.APIRequest;
 import org.jetbrains.plugins.template.api.WorkspaceAPI;
 import org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory;
 
@@ -29,15 +33,49 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		for (Long workspaceID : WorkspaceAPI.getWorkspaces()) {
 			String workspaceName = WorkspaceAPI.getWorkspaceName(workspaceID);
 
-			addExpandableSection(contentPanel, workspaceName, new String[]{"service-a", "service-b"});
+			addExpandableSection(contentPanel, workspaceName, getHostsNames(workspaceID));
 		}
 
 		JButton addWorkspaceButton = new JButton("Add new workspace");
-		addWorkspaceButton.addActionListener(this::AddNewHomeButtonPressed);
+		addWorkspaceButton.addActionListener(this::AddNewWorkspaceButtonPressed);
 		contentPanel.add(addWorkspaceButton);
 
 		contentPanel.revalidate();
 		contentPanel.repaint();
+	}
+
+	private String[] getHostsNames(Long workspaceID) {
+		HostsListRequest.Response response = new APIRequest<>(
+				new MessageBuilder("/host/{workspace}/list")
+						.parse("workspace", workspaceID)
+						.parse()
+				, "GET", null, HostsListRequest.Response.class)
+				.getResponse();
+
+		if(response.hosts == null){
+			return new String[0];
+		}
+
+		String[] toReturn = new String[response.hosts.size()];
+		int index = 0;
+		for (Long host : response.hosts) {
+			HostInfoRequest.Response infoResponse = new APIRequest<>(
+					new MessageBuilder("/host/{workspace}/{host}")
+							.parse("workspace", workspaceID)
+							.parse("host", host)
+							.parse(),
+					"GET", null, HostInfoRequest.Response.class
+			).getResponse();
+
+			if (!infoResponse.response.equals("OK")) {
+				System.out.println("GET HOME INFO REQUEST FAILED FOR " + host);
+				continue;
+			}
+			toReturn[index] = infoResponse.name;
+		}
+
+
+		return toReturn;
 	}
 
 	private void addExpandableSection(JPanel parent, String title, String[] items) {
@@ -66,6 +104,11 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 			itemButton.setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
 			dropdownPanel.add(itemButton);
 		}
+
+		JButton addHostButton = new JButton("Add new host");
+		addHostButton.setAlignmentX(Component.LEFT_ALIGNMENT);
+		addHostButton.addActionListener(this::AddNewHostButtonPressed);
+		dropdownPanel.add(addHostButton);
 
 		Action toggleDropdown = new AbstractAction() {
 			private boolean isExpanded = false;
@@ -98,10 +141,11 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		return button;
 	}
 
+	private void AddNewHostButtonPressed(ActionEvent e) {
+		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
+	}
 
-	private void AddNewHomeButtonPressed(ActionEvent e) {
-		System.out.println("ADD NEW HOME BUTTON PRESSED!");
-//		System.out.println(CreateWorkspace.myToolWindow);
+	private void AddNewWorkspaceButtonPressed(ActionEvent e) {
 		LLamaWindowFactory.instance.updateToolWindowContent(new CreateWorkspacePanel());
 	}
 }
