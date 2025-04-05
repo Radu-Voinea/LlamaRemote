@@ -1,5 +1,7 @@
 package org.jetbrains.plugins.template.api;
 
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.jetbrains.plugins.template.MyBundle;
 import org.jetbrains.plugins.template.Registry;
 
@@ -12,7 +14,7 @@ public class APIRequest<RequestBody, ResponseBody> {
 	private final HttpRequest httpRequest;
 	private final Class<ResponseBody> responseClass;
 
-	public APIRequest(String path, String method, RequestBody requestBody, Class<ResponseBody> responseClass) {
+	public APIRequest(@NotNull String path, @NotNull String method, @Nullable RequestBody requestBody, @NotNull Class<ResponseBody> responseClass) {
 		HttpRequest.Builder builder = HttpRequest.newBuilder()
 				.uri(Registry.createURI(path))
 				.header("Content-Type", "application/json");

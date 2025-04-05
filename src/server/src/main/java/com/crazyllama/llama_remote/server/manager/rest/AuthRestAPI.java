@@ -5,6 +5,7 @@ import com.crazyllama.llama_remote.server.dto.database.User;
 import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,7 +21,7 @@ public class AuthRestAPI {
 		this.databaseManager = databaseManager;
 	}
 
-	@GetMapping("/auth")
+	@PostMapping("/auth")
 	public ResponseEntity<AuthRequest.Response> auth(@RequestBody AuthRequest body) {
 		User user = User.getByUsername(body.username);
 
@@ -33,7 +34,7 @@ public class AuthRestAPI {
 		return ResponseEntity.ok(new AuthRequest.Response("OK", user.generateToken()));
 	}
 
-	@GetMapping("/register")
+	@PostMapping("/register")
 	public ResponseEntity<AuthRequest.Response> register(@RequestBody AuthRequest body) {
 		User user = User.getByUsername(body.username);
 
@@ -48,7 +49,6 @@ public class AuthRestAPI {
 
 		return ResponseEntity.ok(new AuthRequest.Response("OK", user.generateToken()));
 	}
-
 
 
 }
