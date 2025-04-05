@@ -1,6 +1,10 @@
 package com.crazyllama.llama_remote.server.manager;
 
 import com.crazyllama.llama_remote.server.dto.DatabaseConfig;
+import com.crazyllama.llama_remote.server.dto.database.Host;
+import com.crazyllama.llama_remote.server.dto.database.User;
+import com.crazyllama.llama_remote.server.dto.database.Workspace;
+import com.crazyllama.llama_remote.server.dto.database.WorkspaceUser;
 import jakarta.persistence.Entity;
 import lombok.Getter;
 import lombok.experimental.Accessors;
@@ -16,10 +20,15 @@ import java.util.HashMap;
 @Getter
 public class DatabaseManager {
 
+	@Getter
+	@Accessors(fluent = true)
+	private static DatabaseManager instance;
+
 	private SessionFactory sessionFactory;
 
 	public DatabaseManager(@NotNull DatabaseConfig config) {
 		connect(config);
+		DatabaseManager.instance = this;
 	}
 
 	public void connect(DatabaseConfig config) {
@@ -27,6 +36,10 @@ public class DatabaseManager {
 		Configuration configuration = new Configuration();
 
 		// Register entities
+		configuration.addAnnotatedClass(Host.class);
+		configuration.addAnnotatedClass(User.class);
+		configuration.addAnnotatedClass(Workspace.class);
+		configuration.addAnnotatedClass(WorkspaceUser.class);
 
 		configuration.setProperty(JdbcSettings.CONNECTION_PROVIDER, "org.hibernate.hikaricp.internal.HikariCPConnectionProvider");
 		configuration.setProperty("hibernate.hikari.jdbcUrl", config.getConnectionURL());

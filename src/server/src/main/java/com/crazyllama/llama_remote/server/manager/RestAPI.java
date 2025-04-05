@@ -22,19 +22,27 @@ public class RestAPI {
 
 	@GetMapping("/auth")
 	public Auth.Response auth(@RequestBody Auth.Request body) {
-		try (Session session = databaseManager.getSessionFactory().openSession()) {
-			User user = session.get(User.class, body.username);
+		User user = User.getByUsername(body.username);
 
-			if (user == null || !user.passwordHash.equals(body.passwordHash)) {
-				return new Auth.Response("Invalid credentials", "");
-			}
-
-			String token = Auth.Response.generateToken();
-			authenticatedUsers.put(token, user);
-			return new Auth.Response("OK", token);
-		} catch (HibernateException e) {
+		if (user == null || !user.passwordHash.equals(body.passwordHash)) {
 			return new Auth.Response("Invalid credentials", "");
 		}
+
+		return new Auth.Response("OK", user.generateToken());
+	}
+
+	@GetMapping("/register")
+	public Auth.Response register(@RequestBody Auth.Request body) {
+		User user = User.getByUsername(body.username);
+
+		if (user != null) {
+			return new Auth.Response("User already exists", "");
+		}
+
+		user = new User(body);
+		user.save();
+
+		return new Auth.Response("OK", user.generateToken());
 	}
 
 }
