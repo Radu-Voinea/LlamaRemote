@@ -1,4 +1,4 @@
-package com.crazyllama.llama_remote;
+package com.crazyllama.llama_remote.client;
 
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;

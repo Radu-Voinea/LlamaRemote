@@ -13,4 +13,6 @@ module com.crazyllama.llama_remote {
 
 	opens com.crazyllama.llama_remote to javafx.fxml;
 	exports com.crazyllama.llama_remote;
+	exports com.crazyllama.llama_remote.client;
+	opens com.crazyllama.llama_remote.client to javafx.fxml;
 }
