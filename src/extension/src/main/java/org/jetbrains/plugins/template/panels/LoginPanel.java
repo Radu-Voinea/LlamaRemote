@@ -106,6 +106,8 @@ public class LoginPanel extends JPanel {
 			return;
 		}
 
+		Registry.token = response.token;
+
 		// TODO: Go to next UI
 		replyLabel.setForeground(JBColor.GREEN);
 		replyLabel.setText("Login successful");
@@ -131,6 +133,9 @@ public class LoginPanel extends JPanel {
 			return;
 		}
 
+		Registry.token = response.token;
+
+		// TODO: Go to next UI
 		replyLabel.setForeground(JBColor.GREEN);
 		replyLabel.setText("Sign in successful");
 	}
