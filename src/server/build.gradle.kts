@@ -26,12 +26,6 @@ dependencies {
         exclude(group = "org.hibernate", module = "hibernate-core")
     }
 
-    // Annotations
-    implementation("org.projectlombok:lombok")
-    annotationProcessor("org.projectlombok:lombok")
-    implementation("org.jetbrains:annotations:24.1.0")
-    annotationProcessor("org.jetbrains:annotations:24.1.0")
-
     // Database
     implementation("org.hibernate:hibernate-core:6.4.4.Final")
     implementation("org.hibernate.orm:hibernate-hikaricp:6.4.4.Final")
@@ -43,7 +37,4 @@ dependencies {
     implementation("com.mchange:c3p0:0.10.2")
     implementation("aopalliance:aopalliance:1.0")
     implementation("org.osgi:org.osgi.framework:1.10.0")
-
-    // Utils
-    implementation("com.google.code.gson:gson:2.11.0")
 }

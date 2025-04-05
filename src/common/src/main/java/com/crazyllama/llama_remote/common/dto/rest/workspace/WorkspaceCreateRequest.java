@@ -1,4 +1,4 @@
-package com.crazyllama.llama_remote.server.dto.rest.workspace;
+package com.crazyllama.llama_remote.common.dto.rest.workspace;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
@@ -7,16 +7,16 @@ import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
-public class WorkspaceListRequest {
+public class WorkspaceCreateRequest {
 
 	public String token;
+	public String name;
 
 	@AllArgsConstructor
 	@NoArgsConstructor
 	public static class Response {
 
 		public String response;
-		public List<Integer> workspaces;
 
 	}
 

@@ -8,7 +8,7 @@ import jakarta.persistence.ManyToOne;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
+@Entity(name = "workspace_users")
 public class WorkspaceUser {
 
 	@Id

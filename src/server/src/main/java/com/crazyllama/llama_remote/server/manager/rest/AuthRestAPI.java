@@ -1,6 +1,6 @@
 package com.crazyllama.llama_remote.server.manager.rest;
 
-import com.crazyllama.llama_remote.server.dto.rest.auth.AuthRequest;
+import com.crazyllama.llama_remote.common.dto.rest.auth.AuthRequest;
 import com.crazyllama.llama_remote.server.dto.database.User;
 import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import org.springframework.http.ResponseEntity;

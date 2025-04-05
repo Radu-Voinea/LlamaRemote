@@ -21,4 +21,5 @@ fun createProject(module: String) {
 }
 
 createProject(":client")
+createProject(":common")
 createProject(":server")

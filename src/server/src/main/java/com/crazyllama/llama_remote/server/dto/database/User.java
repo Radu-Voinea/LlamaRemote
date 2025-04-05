@@ -1,7 +1,7 @@
 package com.crazyllama.llama_remote.server.dto.database;
 
+import com.crazyllama.llama_remote.common.dto.rest.auth.AuthRequest;
 import com.crazyllama.llama_remote.server.dto.IDatabaseEntry;
-import com.crazyllama.llama_remote.server.dto.rest.auth.AuthRequest;
 import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;

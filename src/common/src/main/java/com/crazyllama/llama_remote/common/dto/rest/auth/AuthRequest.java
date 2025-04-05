@@ -1,4 +1,4 @@
-package com.crazyllama.llama_remote.server.dto.rest.auth;
+package com.crazyllama.llama_remote.common.dto.rest.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
