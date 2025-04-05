@@ -1,21 +1,41 @@
 package com.crazyllama.llama_remote.server.dto.database;
 
+import com.crazyllama.llama_remote.common.dto.rest.host.HostCreateRequest;
+import com.crazyllama.llama_remote.server.dto.IDatabaseEntry;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity(name = "hosts")
-public class Host {
+@NoArgsConstructor
+@Getter
+public class Host implements IDatabaseEntry<Long> {
 
 	@Id
 	@GeneratedValue
-	public long id;
+	private long id;
 
-	public String name;
-	public String ip;
-	public int port;
+	private String name;
+	private String host;
+	private int port;
 
-	public String username;
-	public String privateKey;
+	private String username;
+	private String privateKey;
 
+	public Host(HostCreateRequest request) {
+		this.name = request.name;
+		this.host = request.host;
+		this.port = request.port;
+		this.username = request.username;
+		this.privateKey = request.privateKey;
+	}
+
+	@Override
+	public Long getIdentifier() {
+		return id;
+	}
 }

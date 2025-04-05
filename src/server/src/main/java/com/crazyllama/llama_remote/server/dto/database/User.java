@@ -6,6 +6,7 @@ import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.Session;
 
@@ -14,6 +15,7 @@ import java.util.HashMap;
 @Entity(name = "users")
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode
 public class User implements IDatabaseEntry<String> {
 
 	public static HashMap<String, User> authenticatedUsers = new HashMap<>();

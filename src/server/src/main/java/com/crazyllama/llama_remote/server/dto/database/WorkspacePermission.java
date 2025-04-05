@@ -1,30 +1,34 @@
 package com.crazyllama.llama_remote.server.dto.database;
 
 import com.crazyllama.llama_remote.server.dto.IDatabaseEntry;
+import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.Session;
+
+import java.util.List;
 
 @Entity(name = "workspace_users")
 @AllArgsConstructor
 @NoArgsConstructor
-public class WorkspaceUser implements IDatabaseEntry<Long> {
+@Getter
+public class WorkspacePermission implements IDatabaseEntry<Long> {
 
 	@Id
 	@GeneratedValue
-	public long id;
+	private long id;
 
-	public @ManyToOne User user;
-	public @ManyToOne Workspace workspace;
+	private @ManyToOne User user;
+	private @ManyToOne Host host;
 
-//	public List<String> permissions = new ArrayList<>();
-
-	public WorkspaceUser(Workspace workspace, User user) {
-		this.workspace = workspace;
+	public WorkspacePermission(User user, Host host) {
 		this.user = user;
+		this.host = host;
 	}
 
 	@Override

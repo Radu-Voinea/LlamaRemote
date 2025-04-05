@@ -5,23 +5,14 @@ import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceInfoReques
 import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceListRequest;
 import com.crazyllama.llama_remote.server.dto.database.User;
 import com.crazyllama.llama_remote.server.dto.database.Workspace;
-import com.crazyllama.llama_remote.server.dto.database.WorkspaceUser;
-import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.List;
 
 @RestController
 public class WorkspaceRestAPI {
-
-	private final DatabaseManager databaseManager;
-	private final HashMap<String, User> authenticatedUsers = new HashMap<>();
-
-	public WorkspaceRestAPI(DatabaseManager databaseManager) {
-		this.databaseManager = databaseManager;
-	}
 
 	@GetMapping("/workspace/list")
 	public ResponseEntity<WorkspaceListRequest.Response> list(@RequestHeader("Authorization") String authHeader) {
@@ -38,11 +29,13 @@ public class WorkspaceRestAPI {
 					.body(new WorkspaceListRequest.Response("Unauthorised", new ArrayList<>()));
 		}
 
+		List<Workspace> workspaces = Workspace.getByUser(user);
+
 		return ResponseEntity.ok(
 				new WorkspaceListRequest.Response(
 						"OK",
-						Workspace.getByUser(user).stream()
-								.map(workspace -> (int) workspace.id)
+						workspaces.stream()
+								.map(Workspace::getIdentifier)
 								.toList()
 				)
 		);
@@ -67,11 +60,8 @@ public class WorkspaceRestAPI {
 					.body(new WorkspaceCreateRequest.Response("Unauthorised"));
 		}
 
-		Workspace workspace = new Workspace(body.name);
+		Workspace workspace = new Workspace(body.name, user);
 		workspace.save();
-
-		WorkspaceUser workspaceUser = new WorkspaceUser(workspace, user);
-		workspaceUser.save();
 
 		return ResponseEntity.ok(
 				new WorkspaceCreateRequest.Response("OK")
@@ -84,13 +74,7 @@ public class WorkspaceRestAPI {
 			@RequestHeader("Authorization") String authHeader,
 			@PathVariable("id") int id
 	) {
-		if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-			return ResponseEntity.status(401)
-					.body(new WorkspaceInfoRequest.Response("Unauthorised", ""));
-		}
-
-		String token = authHeader.substring(7);
-		User user = User.getByToken(token);
+		User user = User.getByAuthHeader(authHeader);
 
 		if (user == null) {
 			return ResponseEntity.status(401)
@@ -104,8 +88,13 @@ public class WorkspaceRestAPI {
 					.body(new WorkspaceInfoRequest.Response("Workspace not found", ""));
 		}
 
+		if (!workspace.hasPermission(user)) {
+			return ResponseEntity.status(403)
+					.body(new WorkspaceInfoRequest.Response("Forbidden", ""));
+		}
+
 		return ResponseEntity.ok(
-				new WorkspaceInfoRequest.Response("OK", workspace.name)
+				new WorkspaceInfoRequest.Response("OK", workspace.getName())
 		);
 	}
 
