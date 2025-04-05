@@ -4,6 +4,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.terminal.ui.TerminalWidget;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
@@ -14,21 +15,16 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 
     @Override
     public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-        // Ensure the Terminal tool window is available
-        ToolWindow terminalToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Terminal");
+        ToolWindow terminalToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Copilot Terminal");
         if (terminalToolWindow == null) {
             return;
         }
 
-        // Activate the Terminal tool window
         terminalToolWindow.activate(() -> {
-            // Create a new terminal session
             TerminalToolWindowManager terminalManager = TerminalToolWindowManager.getInstance(project);
-            ShellTerminalWidget terminalWidget = terminalManager.createLocalShellWidget(null, null);
+            TerminalWidget terminalWidget = terminalManager.createShellWidget(null, null, false, true);
 
-            // Add the terminal widget as a new content tab
-            ContentFactory contentFactory = ContentFactory.SERVICE.getInstance();
-            Content content = contentFactory.createContent(terminalWidget.getComponent(), "My Terminal", false);
+            Content content = ContentFactory.getInstance().createContent(terminalWidget.getComponent(), "Copilot Terminal", false);
             toolWindow.getContentManager().addContent(content);
         });
     }
