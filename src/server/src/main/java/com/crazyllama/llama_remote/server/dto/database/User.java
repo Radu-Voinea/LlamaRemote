@@ -1,7 +1,7 @@
 package com.crazyllama.llama_remote.server.dto.database;
 
-import com.crazyllama.llama_remote.server.dto.Auth;
 import com.crazyllama.llama_remote.server.dto.IDatabaseEntry;
+import com.crazyllama.llama_remote.server.dto.rest.auth.AuthRequest;
 import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -22,7 +22,7 @@ public class User implements IDatabaseEntry<String> {
 	public String username;
 	public String passwordHash;
 
-	public User(Auth.Request request) {
+	public User(AuthRequest request) {
 		this.username = request.username;
 		this.passwordHash = request.passwordHash;
 	}
