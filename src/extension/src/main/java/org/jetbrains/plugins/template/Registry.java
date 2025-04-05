@@ -1,7 +1,9 @@
 package org.jetbrains.plugins.template;
 
 import java.net.URI;
+import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 
 public class Registry {
 
@@ -10,14 +12,6 @@ public class Registry {
 
 	public static URI createURI(String path) {
 		return URI.create(host + path);
-	}
-
-	public static HttpRequest createRequest(String path, Object requestBody) {
-		return HttpRequest.newBuilder()
-				.uri(Registry.createURI(path))
-				.header("Content-Type", "application/json")
-				.method("GET", HttpRequest.BodyPublishers.ofString(MyBundle.instance().getGson().toJson(requestBody)))
-				.build();
 	}
 
 
