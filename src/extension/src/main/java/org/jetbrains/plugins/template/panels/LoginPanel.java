@@ -77,7 +77,7 @@ public class LoginPanel extends JPanel {
 		JButton loginButton = new JButton("Login");
 		loginButton.addActionListener(this::loginButtonPressed);
 
-		JButton signInButton = new JButton("Sign in");
+		JButton signInButton = new JButton("Sign up");
 		signInButton.addActionListener(this::signInButtonPressed);
 
 		buttonRow.add(loginButton);
