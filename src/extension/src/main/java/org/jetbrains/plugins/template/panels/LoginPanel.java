@@ -1,6 +1,8 @@
 package org.jetbrains.plugins.template.panels;
 
 import com.crazyllama.llama_remote.common.dto.rest.auth.AuthRequest;
+import com.intellij.ui.JBColor;
+import com.intellij.util.ui.JBUI;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.plugins.template.Registry;
 import org.jetbrains.plugins.template.api.APIRequest;
@@ -18,37 +20,69 @@ public class LoginPanel extends JPanel {
 	public LoginPanel() {
 		super(new FlowLayout(FlowLayout.CENTER, 0, 50));
 
-		JPanel LOGIN_PANEL = new JPanel();
-		LOGIN_PANEL.setLayout(new BoxLayout(LOGIN_PANEL, BoxLayout.Y_AXIS));
-		LOGIN_PANEL.setPreferredSize(new java.awt.Dimension(300, 250)); // Width x Height
-
+		JPanel LOGIN_PANEL = new JPanel(new GridBagLayout());
+		LOGIN_PANEL.setPreferredSize(new Dimension(350, 250));
 		this.add(LOGIN_PANEL);
 
-		JLabel serverLabel = new JLabel("Server");
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.insets = JBUI.insets(5);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+
+		// Server
+		JLabel serverLabel = new JLabel("Server:");
 		serverField = new JTextField();
-		JLabel emailLabel = new JLabel("email");
+		serverField.setPreferredSize(new Dimension(200, 30));
+
+		LOGIN_PANEL.add(serverLabel, gbc);
+		gbc.gridx = 1;
+		LOGIN_PANEL.add(serverField, gbc);
+
+		// Email
+		gbc.gridy++;
+		gbc.gridx = 0;
+		JLabel emailLabel = new JLabel("Email:");
 		emailField = new JTextField();
-		JLabel passwordLabel = new JLabel("password");
+		emailField.setPreferredSize(new Dimension(200, 30));
+
+		LOGIN_PANEL.add(emailLabel, gbc);
+		gbc.gridx = 1;
+		LOGIN_PANEL.add(emailField, gbc);
+
+		// Password
+		gbc.gridy++;
+		gbc.gridx = 0;
+		JLabel passwordLabel = new JLabel("Password:");
 		passwordField = new JPasswordField();
+		passwordField.setPreferredSize(new Dimension(200, 30));
+
+		LOGIN_PANEL.add(passwordLabel, gbc);
+		gbc.gridx = 1;
+		LOGIN_PANEL.add(passwordField, gbc);
+
+		gbc.gridy++;
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
 		errorLabel = new JLabel();
 		errorLabel.setVisible(false);
+		errorLabel.setForeground(JBColor.RED);
+		LOGIN_PANEL.add(errorLabel, gbc);
 
-		serverField.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 30));
-		emailField.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 30));
-		passwordField.setMaximumSize(new java.awt.Dimension(Integer.MAX_VALUE, 30));
+		gbc.gridy++;
+		gbc.gridx = 0;
+		gbc.gridwidth = 2;
 
-		LOGIN_PANEL.add(serverLabel);
-		LOGIN_PANEL.add(serverField);
-		LOGIN_PANEL.add(emailLabel);
-		LOGIN_PANEL.add(emailField);
-		LOGIN_PANEL.add(passwordLabel);
-		LOGIN_PANEL.add(passwordField);
-		LOGIN_PANEL.add(errorLabel);
-
+		JPanel buttonRow = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
 		JButton loginButton = new JButton("Login");
 		loginButton.addActionListener(this::loginButtonPressed);
 
-		LOGIN_PANEL.add(loginButton);
+		JButton signInButton = new JButton("Sign in");
+
+		buttonRow.add(loginButton);
+		buttonRow.add(signInButton);
+
+		LOGIN_PANEL.add(buttonRow, gbc);
 	}
 
 	// TODO: Do something when server not found / invalid server
