@@ -6,6 +6,7 @@ import com.intellij.util.ui.JBUI;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.jetbrains.plugins.template.Registry;
 import org.jetbrains.plugins.template.api.APIRequest;
+import org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -77,7 +78,7 @@ public class LoginPanel extends JPanel {
 		loginButton.addActionListener(this::loginButtonPressed);
 
 		JButton signInButton = new JButton("Sign in");
-		 signInButton.addActionListener(this::signInButtonPressed);
+		signInButton.addActionListener(this::signInButtonPressed);
 
 		buttonRow.add(loginButton);
 		buttonRow.add(signInButton);
@@ -108,9 +109,7 @@ public class LoginPanel extends JPanel {
 
 		Registry.token = response.token;
 
-		// TODO: Go to next UI
-		replyLabel.setForeground(JBColor.GREEN);
-		replyLabel.setText("Login successful");
+		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
 	}
 
 	private void signInButtonPressed(ActionEvent e) {
@@ -135,8 +134,6 @@ public class LoginPanel extends JPanel {
 
 		Registry.token = response.token;
 
-		// TODO: Go to next UI
-		replyLabel.setForeground(JBColor.GREEN);
-		replyLabel.setText("Sign in successful");
+		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
 	}
 }
