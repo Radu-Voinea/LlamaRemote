@@ -31,6 +31,15 @@ public class User implements IDatabaseEntry<String> {
 		return authenticatedUsers.get(token);
 	}
 
+	public static User getByAuthHeader(String header) {
+		if (header == null || !header.startsWith("Bearer ")) {
+			return null;
+		}
+
+		String token = header.substring(7);
+		return User.getByToken(token);
+	}
+
 	public static User getByUsername(String username) {
 		try (Session session = DatabaseManager.instance().getSessionFactory().openSession()) {
 			return session.get(User.class, username);

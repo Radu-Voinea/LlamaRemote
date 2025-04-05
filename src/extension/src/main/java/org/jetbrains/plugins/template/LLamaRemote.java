@@ -9,20 +9,19 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.PropertyKey;
 
 @Getter
-public final class MyBundle extends DynamicBundle {
+public final class LLamaRemote extends DynamicBundle {
 
 	@Getter
 	@Accessors(fluent = true)
-	private static MyBundle instance;
+	private static LLamaRemote instance;
 
-	private final Gson gson = new GsonBuilder()
-			.create();
+	private final Gson gson = new GsonBuilder().create();
 
 	@NonNls
-	private static final String BUNDLE = "messages.MyBundle";
-	private static final MyBundle INSTANCE = new MyBundle();
+	private static final String BUNDLE = "messages.LLamaRemote";
+	private static final LLamaRemote INSTANCE = new LLamaRemote();
 
-	private MyBundle() {
+	private LLamaRemote() {
 		super(BUNDLE);
 
 		instance = this;
