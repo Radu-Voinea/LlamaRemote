@@ -13,7 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class LoginPanel extends JPanel {
-	private final JTextField emailField;
+	private final JTextField usernameField;
 	private final JTextField serverField;
 	private final JLabel replyLabel;
 	private final JPasswordField passwordField;
@@ -43,13 +43,13 @@ public class LoginPanel extends JPanel {
 		// Email
 		gbc.gridy++;
 		gbc.gridx = 0;
-		JLabel emailLabel = new JLabel("Email:");
-		emailField = new JTextField();
-		emailField.setPreferredSize(new Dimension(200, 30));
+		JLabel usernameLabel = new JLabel("Username:");
+		usernameField = new JTextField();
+		usernameField.setPreferredSize(new Dimension(200, 30));
 
-		LOGIN_PANEL.add(emailLabel, gbc);
+		LOGIN_PANEL.add(usernameLabel, gbc);
 		gbc.gridx = 1;
-		LOGIN_PANEL.add(emailField, gbc);
+		LOGIN_PANEL.add(usernameField, gbc);
 
 		// Password
 		gbc.gridy++;
@@ -88,7 +88,7 @@ public class LoginPanel extends JPanel {
 
 	// TODO: Do something when server not found / invalid server
 	private void loginButtonPressed(ActionEvent e) {
-		String username = emailField.getText();
+		String username = usernameField.getText();
 		String password = String.valueOf(passwordField.getPassword());
 		String server = serverField.getText().strip();
 
@@ -113,7 +113,7 @@ public class LoginPanel extends JPanel {
 	}
 
 	private void signInButtonPressed(ActionEvent e) {
-		String username = emailField.getText();
+		String username = usernameField.getText();
 		String password = String.valueOf(passwordField.getPassword());
 		String server = serverField.getText().strip();
 
