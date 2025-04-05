@@ -1,5 +1,9 @@
 rootProject.name = "llama_remote"
 
+plugins {
+    id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
+
 fun createProject(module: String, path: String) {
     include(module)
     project(module).projectDir = file(path)
@@ -20,6 +24,6 @@ fun createProject(module: String) {
     createProject(module, fullPath)
 }
 
-createProject(":client")
+createProject(":extension")
 createProject(":common")
 createProject(":server")
