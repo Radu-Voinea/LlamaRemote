@@ -78,6 +78,7 @@ public class LoginPanel extends JPanel {
 		loginButton.addActionListener(this::loginButtonPressed);
 
 		JButton signInButton = new JButton("Sign in");
+		 signInButton.addActionListener(this::signInButtonPressed);
 
 		buttonRow.add(loginButton);
 		buttonRow.add(signInButton);
@@ -105,6 +106,29 @@ public class LoginPanel extends JPanel {
 			return;
 		}
 
+		// TODO: Go to next UI
 		errorLabel.setText("Login successful");
+	}
+
+	private void signInButtonPressed(ActionEvent e) {
+		String username = emailField.getText();
+		String password = String.valueOf(passwordField.getPassword());
+		String server = serverField.getText().strip();
+
+		String hashedPassword = DigestUtils.sha256Hex(password);
+		Registry.host = server;
+
+		AuthRequest authRequest = new AuthRequest(username, hashedPassword);
+
+		AuthRequest.Response response = new APIRequest<>("/register", "POST", authRequest, AuthRequest.Response.class)
+				.getResponse();
+
+		errorLabel.setVisible(true);
+		if (response.token == null || response.token.isEmpty()) {
+			errorLabel.setText(response.response);
+			return;
+		}
+
+		errorLabel.setText("Sign in successful");
 	}
 }
