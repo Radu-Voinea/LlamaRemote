@@ -1,18 +1,13 @@
 package org.jetbrains.plugins.template.panels;
 
 import com.crazyllama.llama_remote.common.dto.rest.auth.AuthRequest;
-import com.google.gson.Gson;
-import com.raduvoinea.utils.message_builder.MessageBuilder;
 import org.apache.commons.codec.digest.DigestUtils;
+import org.jetbrains.plugins.template.Registry;
+import org.jetbrains.plugins.template.api.APIRequest;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.io.IOException;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 
 public class LoginPanel extends JPanel {
 	private final JTextField emailField;
@@ -56,40 +51,23 @@ public class LoginPanel extends JPanel {
 		LOGIN_PANEL.add(loginButton);
 	}
 
-	// TODO: Move this all of this in a separate class
 	// TODO: Do something when server not found / invalid server
 	private void loginButtonPressed(ActionEvent e) {
 		String username = emailField.getText();
 		String password = String.valueOf(passwordField.getPassword());
-		String server = serverField.getText();
+		String server = serverField.getText().strip();
 
 		String hashedPassword = DigestUtils.sha256Hex(password);
+		Registry.host = server;
 
-		Gson gson = new Gson();
 		AuthRequest authRequest = new AuthRequest(username, hashedPassword);
 
-		HttpRequest request = HttpRequest.newBuilder()
-				.uri(URI.create(new MessageBuilder("http://{server}/auth")
-						.parse("server", server.strip())
-						.parse()
-				))
-				.header("Content-Type", "application/json")
-				.method("GET", HttpRequest.BodyPublishers.ofString(gson.toJson(authRequest)))
-				.build();
-
-
-		HttpResponse<String> response;
-		try {
-			response = HttpClient.newHttpClient().send(request, HttpResponse.BodyHandlers.ofString());
-		} catch (IOException | InterruptedException ex) {
-			throw new RuntimeException(ex);
-		}
-
-		AuthRequest.Response authResponse = gson.fromJson(response.body(), AuthRequest.Response.class);
+		AuthRequest.Response response = new APIRequest<>("/auth", "POST", authRequest, AuthRequest.Response.class)
+				.getResponse();
 
 		errorLabel.setVisible(true);
-		if (authResponse.token == null || authResponse.token.isEmpty()) {
-			errorLabel.setText(authResponse.response);
+		if (response.token == null || response.token.isEmpty()) {
+			errorLabel.setText(response.response);
 			return;
 		}
 
