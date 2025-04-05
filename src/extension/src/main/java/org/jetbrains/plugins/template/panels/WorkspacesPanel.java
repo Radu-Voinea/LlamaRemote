@@ -6,7 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 
-public class WorkspacesPanel extends JScrollPane {
+public class WorkspacesPanel extends JScrollPane implements IRefreshableComponent {
 
 	private final JPanel contentPanel;
 
@@ -19,13 +19,11 @@ public class WorkspacesPanel extends JScrollPane {
 		this.contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
 
 		this.setViewportView(contentPanel);
-		buildUI();
+		refresh();
 	}
 
-	private void buildUI() {
-		contentPanel.removeAll(); // Clear previous content
-
-		System.out.println("Workspaces: " + WorkspaceAPI.getWorkspaces());
+	public void refresh() {
+		contentPanel.removeAll();
 
 		for (Integer workspaceID : WorkspaceAPI.getWorkspaces()) {
 			String workspaceName = WorkspaceAPI.getWorkspaceName(workspaceID);
@@ -33,21 +31,8 @@ public class WorkspacesPanel extends JScrollPane {
 			addExpandableSection(contentPanel, workspaceName, new String[]{"service-a", "service-b"});
 		}
 
-		String[] staticEntries = {
-				"Dev Containers", "Containers", "Images", "Networks", "Volumes", "Kubernetes"
-		};
-		for (String entry : staticEntries) {
-			JButton button = createEntryButton(entry);
-			button.setBorder(BorderFactory.createEmptyBorder(1, 25, 1, 0));
-			contentPanel.add(button);
-		}
-
 		contentPanel.revalidate();
 		contentPanel.repaint();
-	}
-
-	public void refresh() {
-		buildUI();
 	}
 
 	private void addExpandableSection(JPanel parent, String title, String[] items) {

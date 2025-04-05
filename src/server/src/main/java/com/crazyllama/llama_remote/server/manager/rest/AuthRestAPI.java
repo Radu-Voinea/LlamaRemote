@@ -1,12 +1,13 @@
 package com.crazyllama.llama_remote.server.manager.rest;
 
 import com.crazyllama.llama_remote.common.dto.rest.auth.AuthRequest;
+import com.crazyllama.llama_remote.common.dto.rest.auth.TokenCheckRequest;
 import com.crazyllama.llama_remote.server.dto.database.User;
 import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.HashMap;
@@ -32,6 +33,21 @@ public class AuthRestAPI {
 		}
 
 		return ResponseEntity.ok(new AuthRequest.Response("OK", user.generateToken()));
+	}
+
+	@PostMapping("/token/check")
+	public ResponseEntity<TokenCheckRequest.Response> auth(
+			@RequestHeader("Authorization") String authHeader
+	) {
+		User user = User.getByAuthHeader(authHeader);
+
+		if (user == null) {
+			return ResponseEntity
+					.status(401)
+					.body(new TokenCheckRequest.Response("Unauthorized", false));
+		}
+
+		return ResponseEntity.ok(new TokenCheckRequest.Response("OK", true));
 	}
 
 	@PostMapping("/register")

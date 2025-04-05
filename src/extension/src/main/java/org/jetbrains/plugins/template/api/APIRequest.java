@@ -2,7 +2,7 @@ package org.jetbrains.plugins.template.api;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.plugins.template.MyBundle;
+import org.jetbrains.plugins.template.LLamaRemote;
 import org.jetbrains.plugins.template.Registry;
 
 import java.net.http.HttpClient;
@@ -24,7 +24,7 @@ public class APIRequest<RequestBody, ResponseBody> {
 		}
 
 		if (requestBody != null) {
-			builder = builder.method(method, HttpRequest.BodyPublishers.ofString(MyBundle.instance().getGson().toJson(requestBody)));
+			builder = builder.method(method, HttpRequest.BodyPublishers.ofString(LLamaRemote.instance().getGson().toJson(requestBody)));
 		} else {
 			builder = builder.method(method, HttpRequest.BodyPublishers.noBody());
 		}
@@ -36,7 +36,7 @@ public class APIRequest<RequestBody, ResponseBody> {
 	public ResponseBody getResponse() {
 		try (HttpClient httpClient = HttpClient.newHttpClient()) {
 			HttpResponse<String> httpResponse = httpClient.send(this.httpRequest, HttpResponse.BodyHandlers.ofString());
-			return MyBundle.instance().getGson().fromJson(httpResponse.body(), this.responseClass);
+			return LLamaRemote.instance().getGson().fromJson(httpResponse.body(), this.responseClass);
 		} catch (Exception exception) {
 			exception.printStackTrace();
 		}
