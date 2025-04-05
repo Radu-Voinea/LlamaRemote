@@ -26,7 +26,7 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 	public void refresh() {
 		contentPanel.removeAll();
 
-		for (Integer workspaceID : WorkspaceAPI.getWorkspaces()) {
+		for (Long workspaceID : WorkspaceAPI.getWorkspaces()) {
 			String workspaceName = WorkspaceAPI.getWorkspaceName(workspaceID);
 
 			addExpandableSection(contentPanel, workspaceName, new String[]{"service-a", "service-b"});

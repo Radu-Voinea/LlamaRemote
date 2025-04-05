@@ -8,7 +8,7 @@ import java.net.http.HttpResponse;
 public class Registry {
 
 	public static String host = "http://localhost:8080";
-	public static String token = "3830c08609c2bdd736f077121fb74b10e5dc4d1a0ec531cd9364fdd291757218";
+	public static String token = "BnnZUiM9QIeuNebS9GoE8Wy4DyQdbij3V76ipsYZZGdGjEXO8bvnpMuXoStaLTaC";
 
 	public static URI createURI(String path) {
 		return URI.create(host + path);
