@@ -6,7 +6,6 @@ import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.plugins.template.services.MyProjectService;
 
 import javax.swing.*;
 import javax.swing.event.PopupMenuEvent;
@@ -32,10 +31,8 @@ public class AddUser implements com.intellij.openapi.wm.ToolWindowFactory {
     }
 
     private static class MyToolWindow {
-        private final MyProjectService service;
 
         public MyToolWindow(ToolWindow toolWindow) {
-            this.service = ServiceManager.getService(toolWindow.getProject(), MyProjectService.class);
         }
 
         public JPanel getContent() {

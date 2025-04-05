@@ -9,7 +9,7 @@ import java.util.List;
 
 public class WorkspaceAPI {
 
-	public static List<Integer> getWorkspaces() {
+	public static List<Long> getWorkspaces() {
 		WorkspaceListRequest.Response response = new APIRequest<>("/workspace/list", "GET", null, WorkspaceListRequest.Response.class).getResponse();
 
 		if (response == null) {
@@ -20,7 +20,7 @@ public class WorkspaceAPI {
 	}
 
 
-	public static String getWorkspaceName(int id) {
+	public static String getWorkspaceName(long id) {
 		WorkspaceInfoRequest.Response response = new APIRequest<>("/workspace/" + id, "GET", null, WorkspaceInfoRequest.Response.class).getResponse();
 
 		if (response == null) {
