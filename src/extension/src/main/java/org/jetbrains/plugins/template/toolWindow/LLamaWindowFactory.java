@@ -35,6 +35,11 @@ public class LLamaWindowFactory implements com.intellij.openapi.wm.ToolWindowFac
 	}
 
 	public void updateToolWindowContent(JComponent component) {
+		if(component == null){
+			System.out.println("UPDATE COMPONENT IS NULL");
+			return;
+		}
+
 		llamaWindow.setActiveComponent(component);
 
 		toolWindow.getContentManager().removeAllContents(true);
@@ -53,15 +58,23 @@ public class LLamaWindowFactory implements com.intellij.openapi.wm.ToolWindowFac
 		private JComponent activeComponent;
 
 		public LlamaWindow(ToolWindow toolWindow) {
+			System.out.println("Verify registry");
 			if (Registry.host == null || Registry.host.isEmpty() || Registry.token == null || Registry.token.isEmpty()) {
+				System.out.println("One of them don't exist");
 				this.activeComponent = new LoginPanel();
 				return;
 			}
 
+			//TODO (HIGH): Not working as expected
 			TokenCheckRequest.Response response = new APIRequest<>(
 					"/token/check", "POST", null,
 					TokenCheckRequest.Response.class)
 					.getResponse();
+
+			System.out.println(Registry.host);
+			System.out.println(Registry.token);
+
+			System.out.println("Response status: " + response.status);
 
 			if (!response.status) {
 				this.activeComponent = new LoginPanel();

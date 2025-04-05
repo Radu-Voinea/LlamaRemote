@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.template.panels;
 
 import org.jetbrains.plugins.template.api.WorkspaceAPI;
+import org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -30,6 +31,10 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 
 			addExpandableSection(contentPanel, workspaceName, new String[]{"service-a", "service-b"});
 		}
+
+		JButton addWorkspaceButton = new JButton("Add new workspace");
+		addWorkspaceButton.addActionListener(this::AddNewHomeButtonPressed);
+		contentPanel.add(addWorkspaceButton);
 
 		contentPanel.revalidate();
 		contentPanel.repaint();
@@ -91,5 +96,12 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		button.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		return button;
+	}
+
+
+	private void AddNewHomeButtonPressed(ActionEvent e) {
+		System.out.println("ADD NEW HOME BUTTON PRESSED!");
+//		System.out.println(CreateWorkspace.myToolWindow);
+		LLamaWindowFactory.instance.updateToolWindowContent(new CreateWorkspacePanel());
 	}
 }
