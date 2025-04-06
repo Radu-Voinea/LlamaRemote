@@ -4,10 +4,13 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
-import com.intellij.terminal.JBTerminalPanel;
 import com.intellij.terminal.ui.TerminalWidget;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
+import com.jediterm.terminal.TtyConnector;
+import lombok.Getter;
+import lombok.SneakyThrows;
+import lombok.experimental.Accessors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.plugins.template.api.OpenAIAPI;
 import org.jetbrains.plugins.terminal.ShellTerminalWidget;
@@ -15,10 +18,13 @@ import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class TerminalWindowFactory implements ToolWindowFactory {
+
+	@Getter
+	@Accessors(fluent = true)
+	private static TerminalWindowFactory instance;
 
 	private String lastBuffer = "";
 
@@ -35,58 +41,62 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 		}
 	}
 
+	private ToolWindow terminalToolWindow;
+	private ShellTerminalWidget shellTerminalWidget;
+	private TerminalWidget terminalWidget;
+	private TerminalToolWindowManager terminalManager;
+
+
+	public TerminalWindowFactory() {
+		instance = this;
+	}
 
 	@Override
+	@SneakyThrows
 	public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-		ToolWindow terminalToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Copilot Terminal");
-		if (terminalToolWindow == null) {
-			return;
-		}
+		this.terminalToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Copilot Terminal");
 
-		terminalToolWindow.activate(() -> {
-			TerminalToolWindowManager terminalManager = TerminalToolWindowManager.getInstance(project);
-			TerminalWidget terminalWidget = terminalManager.createShellWidget(null, null, false, true);
+		this. terminalManager = TerminalToolWindowManager.getInstance(project);
+		this. terminalWidget = terminalManager.createShellWidget(null, null, false, true);
+		this. shellTerminalWidget = (ShellTerminalWidget) widgetMethod.invoke(terminalWidget);
 
-			try {
-				ShellTerminalWidget shellTerminalWidget = (ShellTerminalWidget) widgetMethod.invoke(terminalWidget);
+		shellTerminalWidget.getTerminalPanel().addPreKeyEventHandler((event) -> {
+			if (event.getExtendedKeyCode() == KeyEvent.VK_ENTER) {
+				String processedBuffer = lastBuffer.strip();
 
-				;
-				shellTerminalWidget.getTerminal();
-				JBTerminalPanel terminalPanel = shellTerminalWidget.getTerminalPanel();
+				if (processedBuffer.startsWith("##")) {
+					event.consume();
 
-				shellTerminalWidget.getTerminalPanel().addPreKeyEventHandler((event) -> {
-					if (event.getExtendedKeyCode() == KeyEvent.VK_ENTER) {
-						String processedBuffer = lastBuffer.strip();
+					processedBuffer = processedBuffer.substring(2);
+					processedBuffer = processedBuffer.strip();
 
-						if (processedBuffer.startsWith("##")) {
-							event.consume();
-
-							processedBuffer = processedBuffer.substring(2);
-							processedBuffer = processedBuffer.strip();
-
-							String response = OpenAIAPI.getChatGPTResponse(processedBuffer);
-							try {
-								for (int i = 0; i < lastBuffer.length(); i++) {
-									shellTerminalWidget.getTtyConnector().write("\b");
-								}
-								shellTerminalWidget.getTtyConnector().write(response);
-							} catch (IOException e) {
-								throw new RuntimeException(e);
-							}
+					String response = OpenAIAPI.getChatGPTResponse(processedBuffer);
+					try {
+						for (int i = 0; i < lastBuffer.length(); i++) {
+							shellTerminalWidget.getTtyConnector().write("\b");
 						}
-					} else {
-						lastBuffer = shellTerminalWidget.getTypedShellCommand();
+						shellTerminalWidget.getTtyConnector().write(response);
+					} catch (IOException e) {
+						throw new RuntimeException(e);
 					}
-				});
-
-			} catch (IllegalAccessException | InvocationTargetException e) {
-				e.printStackTrace();
+				}
+			} else {
+				lastBuffer = shellTerminalWidget.getTypedShellCommand();
 			}
+		});
 
-			Content content = ContentFactory.getInstance().createContent(terminalWidget.getComponent(), "Copilot Terminal", false);
-			toolWindow.getContentManager().addContent(content);
+		Content content = ContentFactory.getInstance().createContent(terminalWidget.getComponent(), "Copilot Terminal", false);
+		toolWindow.getContentManager().addContent(content);
+	}
+
+	public void focus() {
+		terminalToolWindow.activate(() -> {
 		});
 	}
 
+	@SneakyThrows
+	public void write(String text) {
+		shellTerminalWidget.getTtyConnector().write(text);
+	}
 
 }

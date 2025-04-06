@@ -7,6 +7,7 @@ import com.raduvoinea.utils.message_builder.MessageBuilder;
 import org.jetbrains.plugins.template.api.APIRequest;
 import org.jetbrains.plugins.template.api.WorkspaceAPI;
 import org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory;
+import org.jetbrains.plugins.template.toolWindow.TerminalWindowFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -171,7 +172,10 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 				.parse("host", response.host)
 				.parse();
 
-		System.out.println("SSH COMMAND: " + sshCommand);
+//		System.out.println("SSH COMMAND: " + sshCommand);
+
+		TerminalWindowFactory.instance().focus();
+		TerminalWindowFactory.instance().write(sshCommand);
 		// Optional: tempKeyFile.delete();
 	}
 
