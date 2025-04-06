@@ -35,7 +35,7 @@ public class LLamaWindowFactory implements com.intellij.openapi.wm.ToolWindowFac
 	}
 
 	public void updateToolWindowContent(JComponent component) {
-		if(component == null){
+		if (component == null) {
 			System.out.println("UPDATE COMPONENT IS NULL");
 			return;
 		}

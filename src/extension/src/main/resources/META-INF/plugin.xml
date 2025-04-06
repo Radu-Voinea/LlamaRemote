@@ -1,8 +1,8 @@
 <!-- Plugin Configuration File. Read more: https://plugins.jetbrains.com/docs/intellij/plugin-configuration-file.html -->
 <idea-plugin>
     <id>org.jetbrains.plugins.template</id>
-    <name>IntelliJ Platform Plugin Template</name>
-    <vendor>JetBrains</vendor>
+    <name>Llama Remote</name>
+    <vendor>CrazyLlama</vendor>
 
     <depends>com.intellij.modules.platform</depends>
     <depends>org.jetbrains.plugins.terminal</depends>
@@ -10,7 +10,7 @@
 <!--    <resource-bundle>messages.MyBundle</resource-bundle>-->
 
     <extensions defaultExtensionNs="com.intellij">
-        <toolWindow factoryClass="org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory" id="MyToolWindow"/>
+        <toolWindow factoryClass="org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory" id="Llama Remote"/>
 <!--        <postStartupActivity implementation="org.jetbrains.plugins.template.startup.MyProjectActivity" />-->
 
         <toolWindow
