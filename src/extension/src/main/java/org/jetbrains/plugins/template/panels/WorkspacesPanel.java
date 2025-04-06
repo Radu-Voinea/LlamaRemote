@@ -11,10 +11,17 @@ import org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 public class WorkspacesPanel extends JScrollPane implements IRefreshableComponent {
 
 	private final JPanel contentPanel;
+	private final Map<String, Long> hostNameToId = new HashMap<>();
 
 	public WorkspacesPanel() {
 		super(null,
@@ -33,8 +40,8 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 
 		for (Long workspaceID : WorkspaceAPI.getWorkspaces()) {
 			String workspaceName = WorkspaceAPI.getWorkspaceName(workspaceID);
-
-			addExpandableSection(contentPanel, workspaceName, workspaceID, getHostsNames(workspaceID));
+			getHosts(workspaceID);
+			addExpandableSection(contentPanel, workspaceName, workspaceID);
 		}
 
 		JButton addWorkspaceButton = new JButton("Add new workspace");
@@ -45,7 +52,7 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		contentPanel.repaint();
 	}
 
-	private String[] getHostsNames(Long workspaceID) {
+	private void getHosts(Long workspaceID) {
 		HostsListRequest.Response response = new APIRequest<>(
 				new MessageBuilder("/host/{workspace}/list")
 						.parse("workspace", workspaceID)
@@ -53,12 +60,6 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 				, "GET", null, HostsListRequest.Response.class)
 				.getResponse();
 
-		if (response.hosts == null) {
-			return new String[0];
-		}
-
-		String[] toReturn = new String[response.hosts.size()];
-		int index = 0;
 		for (Long host : response.hosts) {
 			HostInfoRequest.Response infoResponse = new APIRequest<>(
 					new MessageBuilder("/host/{workspace}/{host}")
@@ -72,14 +73,12 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 				System.out.println("GET HOME INFO REQUEST FAILED FOR " + host);
 				continue;
 			}
-			toReturn[index] = infoResponse.name;
+
+			hostNameToId.put(infoResponse.name, host);
 		}
-
-
-		return toReturn;
 	}
 
-	private void addExpandableSection(JPanel parent, String title, Long workspaceID, String[] items) {
+	private void addExpandableSection(JPanel parent, String title, Long workspaceID) {
 		JPanel sectionPanel = new JPanel();
 		sectionPanel.setLayout(new BoxLayout(sectionPanel, BoxLayout.Y_AXIS));
 		sectionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -104,9 +103,10 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		dropdownPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 0));
 		dropdownPanel.setVisible(false);
 
-		for (String item : items) {
-			JButton itemButton = createEntryButton(item);
+		for (Map.Entry<String, Long> entry : hostNameToId.entrySet()) {
+			JButton itemButton = createEntryButton(entry.getKey());
 			itemButton.setBorder(BorderFactory.createEmptyBorder(1, 0, 1, 0));
+			itemButton.addActionListener((e) -> onHostButtonPressed(e, entry.getValue(), workspaceID));
 			dropdownPanel.add(itemButton);
 		}
 
@@ -145,6 +145,52 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		button.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		return button;
+	}
+
+	private void onHostButtonPressed(ActionEvent e, long hostID, long workspaceID) {
+		HostInfoRequest.Response response = new APIRequest<>(
+				new MessageBuilder("/host/{workspace}/{host}")
+						.parse("workspace", workspaceID)
+						.parse("host", hostID)
+						.parse()
+				, "GET", null, HostInfoRequest.Response.class)
+				.getResponse();
+		File sshKeyFile;
+		try {
+			sshKeyFile = writePrivateKeyToTempFile(response.privateKey);
+		} catch (IOException ex) {
+			System.out.println("SSH KEY WAS NOT ABLE TO BE WRITTEN TO A TEMP FILE");
+			throw new RuntimeException(ex);
+		}
+
+		// ssh -i /path/to/private/key -p [port] [username]@[host]
+		String sshCommand = new MessageBuilder("ssh -i {key_path} -p {port} {user}@{host}")
+				.parse("key_path", sshKeyFile.getAbsolutePath())
+				.parse("port", response.port)
+				.parse("user", response.username)
+				.parse("host", response.host)
+				.parse();
+
+		System.out.println("SSH COMMAND: " + sshCommand);
+		// Optional: tempKeyFile.delete();
+	}
+
+	public File writePrivateKeyToTempFile(String privateKeyContent) throws IOException {
+		// Create a temp file with a specific prefix and suffix
+		File tempFile = Files.createTempFile("ssh_key_", ".pem").toFile();
+
+		// Make sure only the owner can read/write the file (for security)
+		tempFile.setReadable(false, false);
+		tempFile.setReadable(true, true);
+		tempFile.setWritable(false, false);
+		tempFile.setWritable(true, true);
+
+		// Write the private key content
+		try (FileWriter writer = new FileWriter(tempFile)) {
+			writer.write(privateKeyContent);
+		}
+
+		return tempFile;
 	}
 
 	private void AddNewUserButtonPressed(ActionEvent e, Long workspaceID) {
