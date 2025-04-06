@@ -49,6 +49,11 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 	}
 
 	@Override
+	public boolean isDoNotActivateOnStart() {
+		return false;
+	}
+
+	@Override
 	@SneakyThrows
 	public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
 		this.terminalToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Llama Terminal");

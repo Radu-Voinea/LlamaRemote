@@ -12,15 +12,19 @@
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory" id="MyToolWindow"/>
 <!--        <postStartupActivity implementation="org.jetbrains.plugins.template.startup.MyProjectActivity" />-->
-    </extensions>
 
-    <extensions defaultExtensionNs="com.intellij">
         <toolWindow
                 id="Llama Terminal"
                 anchor="bottom"
                 factoryClass="org.jetbrains.plugins.template.toolWindow.TerminalWindowFactory"
                 canCloseContent="true"
+
+        />
+
+        <postStartupActivity
+                implementation="org.jetbrains.plugins.template.toolWindow.TerminalAutoOpener"
         />
     </extensions>
+
 
 </idea-plugin>
