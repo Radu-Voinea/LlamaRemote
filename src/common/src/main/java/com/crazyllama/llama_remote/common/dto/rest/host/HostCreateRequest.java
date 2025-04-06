@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class HostCreateRequest {
 
-	public int workspaceId;
 	public String name;
 	public String host;
 	public int port;

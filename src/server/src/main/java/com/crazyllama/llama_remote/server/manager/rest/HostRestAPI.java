@@ -15,9 +15,10 @@ import java.util.List;
 @RestController
 public class HostRestAPI {
 
-	@PostMapping("/host/create")
+	@PostMapping("/host/{workspace_id}/create")
 	public ResponseEntity<HostCreateRequest.Response> create(
 			@RequestHeader("Authorization") String authHeader,
+			@PathVariable("workspace_id") long workspaceId,
 			@RequestBody HostCreateRequest body
 	) {
 		User user = User.getByAuthHeader(authHeader);
@@ -28,7 +29,7 @@ public class HostRestAPI {
 					.body(new HostCreateRequest.Response("Unauthorized"));
 		}
 
-		Workspace workspace = Workspace.getById(body.workspaceId);
+		Workspace workspace = Workspace.getById(workspaceId);
 
 		if (workspace == null) {
 			return ResponseEntity
