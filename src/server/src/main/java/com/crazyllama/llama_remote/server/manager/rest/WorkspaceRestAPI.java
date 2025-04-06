@@ -161,7 +161,7 @@ public class WorkspaceRestAPI {
 				continue;
 			}
 
-			WorkspacePermission permission = new WorkspacePermission(user, host);
+			WorkspacePermission permission = new WorkspacePermission(targetUser, host);
 			workspace.addPermission(permission);
 		}
 
