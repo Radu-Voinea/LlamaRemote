@@ -156,6 +156,7 @@ public class AddUserPanel extends JPanel {
 		int index = 0;
 		for (String username : response.usernames) {
 			users[index] = username;
+			index++;
 		}
 
 		return users;
