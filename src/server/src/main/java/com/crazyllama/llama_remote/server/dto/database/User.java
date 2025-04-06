@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.Session;
 
@@ -16,6 +17,7 @@ import java.util.HashMap;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode
+@Getter
 public class User implements IDatabaseEntry<String> {
 
 	public static HashMap<String, User> authenticatedUsers = new HashMap<>();

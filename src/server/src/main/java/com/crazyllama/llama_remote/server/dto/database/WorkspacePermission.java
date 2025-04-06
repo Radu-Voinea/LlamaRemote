@@ -6,7 +6,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -48,5 +47,11 @@ public class WorkspacePermission implements IDatabaseEntry<Long> {
 		int result = Objects.hashCode(user);
 		result = 31 * result + Objects.hashCode(host);
 		return result;
+	}
+
+	@Override
+	public void save() {
+		this.user.save();
+		this.host.save();
 	}
 }

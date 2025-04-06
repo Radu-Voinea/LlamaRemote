@@ -90,10 +90,9 @@ public class Workspace implements IDatabaseEntry<Long> {
 	}
 
 	public void addPermission(WorkspacePermission permission) {
-		for (WorkspacePermission workspacePermission : permissions) {
-			if (permission.equals(workspacePermission)) {
-				return;
-			}
+		if (permissions.contains(permission)) {
+			System.out.println("Permission already exists for user: " + permission.getUser().getUsername());
+			return;
 		}
 
 		this.permissions.add(permission);
@@ -102,5 +101,18 @@ public class Workspace implements IDatabaseEntry<Long> {
 	@Override
 	public Long getIdentifier() {
 		return id;
+	}
+
+	@Override
+	public void save() {
+		IDatabaseEntry.super.save();
+
+		for (Host host : hosts) {
+			host.save();
+		}
+
+		for (WorkspacePermission permission : permissions) {
+			permission.save();
+		}
 	}
 }
