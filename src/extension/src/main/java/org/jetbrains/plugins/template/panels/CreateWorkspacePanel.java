@@ -52,7 +52,7 @@ public class CreateWorkspacePanel extends JPanel {
 		saveButton.addActionListener(this::saveButtonPressed);
 
 		JButton cancelButton = new JButton("Cancel");
-		saveButton.addActionListener(this::cancelButtonPressed);
+		cancelButton.addActionListener(this::cancelButtonPressed);
 
 		buttonPanel.add(cancelButton);
 		buttonPanel.add(saveButton);
