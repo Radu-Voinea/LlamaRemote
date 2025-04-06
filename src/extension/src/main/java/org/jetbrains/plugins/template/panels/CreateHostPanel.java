@@ -1,6 +1,7 @@
 package org.jetbrains.plugins.template.panels;
 
 import com.crazyllama.llama_remote.common.dto.rest.host.HostCreateRequest;
+import com.raduvoinea.utils.message_builder.MessageBuilder;
 import org.jetbrains.plugins.template.api.APIRequest;
 import org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory;
 
@@ -133,16 +134,14 @@ public class CreateHostPanel extends JPanel {
 		String host = hostField.getText();
 		String username = usernameField.getText();
 		String privateKey = privateKeyArea.getText();
-		HostCreateRequest request = new HostCreateRequest(workspace_id, name, host, port, username, privateKey);
+		HostCreateRequest request = new HostCreateRequest(name, host, port, username, privateKey);
 
-		System.out.println("HOST CREATE REQUEST " + request);
-
-
-		HostCreateRequest.Response response = new APIRequest<>("/host/create", "POST",
+		HostCreateRequest.Response response = new APIRequest<>(new MessageBuilder("/host/{workspace}/create")
+				.parse("workspace", workspace_id)
+				.parse()
+				, "POST",
 				request, HostCreateRequest.Response.class)
 				.getResponse();
-
-		System.out.println("HOST CREATE REQUEST " + response);
 
 		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
 	}
