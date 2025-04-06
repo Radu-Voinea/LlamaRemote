@@ -4,14 +4,17 @@ import com.intellij.openapi.project.Project;
 import com.intellij.openapi.wm.ToolWindow;
 import com.intellij.openapi.wm.ToolWindowFactory;
 import com.intellij.openapi.wm.ToolWindowManager;
+import com.intellij.terminal.JBTerminalPanel;
 import com.intellij.terminal.ui.TerminalWidget;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.plugins.template.api.OpenAIAPI;
 import org.jetbrains.plugins.terminal.ShellTerminalWidget;
 import org.jetbrains.plugins.terminal.TerminalToolWindowManager;
 
 import java.awt.event.KeyEvent;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
@@ -47,13 +50,35 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 			try {
 				ShellTerminalWidget shellTerminalWidget = (ShellTerminalWidget) widgetMethod.invoke(terminalWidget);
 
+				;
+				shellTerminalWidget.getTerminal();
+				JBTerminalPanel terminalPanel = shellTerminalWidget.getTerminalPanel();
+
 				shellTerminalWidget.getTerminalPanel().addPreKeyEventHandler((event) -> {
 					if (event.getExtendedKeyCode() == KeyEvent.VK_ENTER) {
-						System.out.println(lastBuffer);
+						String processedBuffer = lastBuffer.strip();
+
+						if (processedBuffer.startsWith("##")) {
+							event.consume();
+
+							processedBuffer = processedBuffer.substring(2);
+							processedBuffer = processedBuffer.strip();
+
+							String response = OpenAIAPI.getChatGPTResponse(processedBuffer);
+							try {
+								for (int i = 0; i < lastBuffer.length(); i++) {
+									shellTerminalWidget.getTtyConnector().write("\b");
+								}
+								shellTerminalWidget.getTtyConnector().write(response);
+							} catch (IOException e) {
+								throw new RuntimeException(e);
+							}
+						}
 					} else {
 						lastBuffer = shellTerminalWidget.getTypedShellCommand();
 					}
 				});
+
 			} catch (IllegalAccessException | InvocationTargetException e) {
 				e.printStackTrace();
 			}
