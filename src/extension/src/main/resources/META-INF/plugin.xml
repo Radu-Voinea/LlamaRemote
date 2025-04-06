@@ -5,11 +5,22 @@
     <vendor>JetBrains</vendor>
 
     <depends>com.intellij.modules.platform</depends>
+    <depends>org.jetbrains.plugins.terminal</depends>
 
-    <resource-bundle>messages.MyBundle</resource-bundle>
+<!--    <resource-bundle>messages.MyBundle</resource-bundle>-->
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow factoryClass="org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory" id="MyToolWindow"/>
-        <postStartupActivity implementation="org.jetbrains.plugins.template.startup.MyProjectActivity" />
+<!--        <postStartupActivity implementation="org.jetbrains.plugins.template.startup.MyProjectActivity" />-->
     </extensions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow
+                id="Copilot Terminal"
+                anchor="bottom"
+                factoryClass="org.jetbrains.plugins.template.toolWindow.TerminalWindowFactory"
+                canCloseContent="true"
+        />
+    </extensions>
+
 </idea-plugin>

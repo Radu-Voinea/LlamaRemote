@@ -9,7 +9,6 @@ import lombok.ToString;
 @ToString
 public class HostCreateRequest {
 
-	public long workspaceId;
 	public String name;
 	public String host;
 	public int port;
