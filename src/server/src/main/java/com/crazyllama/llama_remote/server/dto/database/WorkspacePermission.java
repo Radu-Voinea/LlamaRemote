@@ -1,19 +1,18 @@
 package com.crazyllama.llama_remote.server.dto.database;
 
 import com.crazyllama.llama_remote.server.dto.IDatabaseEntry;
-import com.crazyllama.llama_remote.server.manager.DatabaseManager;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.Session;
 
-import java.util.List;
+import java.util.Objects;
 
-@Entity(name = "workspace_users")
+@Entity(name = "workspace_permissions")
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
@@ -34,5 +33,20 @@ public class WorkspacePermission implements IDatabaseEntry<Long> {
 	@Override
 	public Long getIdentifier() {
 		return id;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+
+		WorkspacePermission that = (WorkspacePermission) o;
+		return Objects.equals(user, that.user) && Objects.equals(host, that.host);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hashCode(user);
+		result = 31 * result + Objects.hashCode(host);
+		return result;
 	}
 }

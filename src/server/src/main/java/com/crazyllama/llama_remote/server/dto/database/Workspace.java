@@ -63,7 +63,7 @@ public class Workspace implements IDatabaseEntry<Long> {
 	}
 
 	public List<Host> getHostsForUser(User user) {
-		if (user.equals(this.owner)){
+		if (user.equals(this.owner)) {
 			return this.hosts;
 		}
 
@@ -89,6 +89,16 @@ public class Workspace implements IDatabaseEntry<Long> {
 
 	public void addHost(Host host) {
 		this.hosts.add(host);
+	}
+
+	public void addPermission(WorkspacePermission permission) {
+		for (WorkspacePermission workspacePermission : permissions) {
+			if (permission.equals(workspacePermission)) {
+				return;
+			}
+		}
+
+		this.permissions.add(permission);
 	}
 
 	@Override

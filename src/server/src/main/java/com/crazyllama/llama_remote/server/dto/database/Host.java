@@ -5,10 +5,12 @@ import com.crazyllama.llama_remote.server.dto.IDatabaseEntry;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity(name = "hosts")
 @NoArgsConstructor
@@ -37,5 +39,23 @@ public class Host implements IDatabaseEntry<Long> {
 	@Override
 	public Long getIdentifier() {
 		return id;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Host host1 = (Host) o;
+		return port == host1.port && Objects.equals(name, host1.name) && Objects.equals(host, host1.host) && Objects.equals(username, host1.username) && Objects.equals(privateKey, host1.privateKey);
+	}
+
+	@Override
+	public int hashCode() {
+		int result = Objects.hashCode(name);
+		result = 31 * result + Objects.hashCode(host);
+		result = 31 * result + port;
+		result = 31 * result + Objects.hashCode(username);
+		result = 31 * result + Objects.hashCode(privateKey);
+		return result;
 	}
 }
