@@ -54,7 +54,6 @@ public class AddUserPanel extends JPanel {
 		userList.setVisibleRowCount(5); // adjust as needed
 		userListPanel.add(new JScrollPane(userList), BorderLayout.CENTER);
 
-// Add above the formPanel
 		this.add(userListPanel, BorderLayout.NORTH);
 
 
@@ -193,6 +192,7 @@ public class AddUserPanel extends JPanel {
 		int index = 0;
 		for (String hostname : hostNameToID.keySet()) {
 			hostItems[index] = new MultiCheckComboBoxNoClose.CheckComboBoxItem(hostname, false);
+			index++;
 		}
 		hostsCombo = new MultiCheckComboBoxNoClose(hostItems);
 
@@ -204,7 +204,6 @@ public class AddUserPanel extends JPanel {
 		public MultiCheckComboBoxNoClose(CheckComboBoxItem[] items) {
 			super(items);
 			setRenderer(new CheckComboRenderer());
-			updateUI();
 		}
 
 		@Override
@@ -287,7 +286,7 @@ public class AddUserPanel extends JPanel {
 					boolean isSelected,
 					boolean cellHasFocus
 			) {
-				if (index == -1) {
+				if (index == -1 || value == null) {
 					label.setText("select host");
 					label.setOpaque(true);
 					label.setBackground(list.getBackground());

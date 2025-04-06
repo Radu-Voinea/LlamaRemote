@@ -16,7 +16,7 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <toolWindow
-                id="Copilot Terminal"
+                id="Llama Terminal"
                 anchor="bottom"
                 factoryClass="org.jetbrains.plugins.template.toolWindow.TerminalWindowFactory"
                 canCloseContent="true"

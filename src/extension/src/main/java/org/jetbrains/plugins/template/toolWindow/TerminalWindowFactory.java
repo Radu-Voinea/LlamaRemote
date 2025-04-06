@@ -54,7 +54,7 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 	@Override
 	@SneakyThrows
 	public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
-		this.terminalToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Copilot Terminal");
+		this.terminalToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Llama Terminal");
 
 		this. terminalManager = TerminalToolWindowManager.getInstance(project);
 		this. terminalWidget = terminalManager.createShellWidget(null, null, false, true);
@@ -85,7 +85,7 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 			}
 		});
 
-		Content content = ContentFactory.getInstance().createContent(terminalWidget.getComponent(), "Copilot Terminal", false);
+		Content content = ContentFactory.getInstance().createContent(terminalWidget.getComponent(), "Llama Terminal", false);
 		toolWindow.getContentManager().addContent(content);
 	}
 
