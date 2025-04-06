@@ -8,6 +8,9 @@ import jakarta.persistence.Id;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcType;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 import java.util.Objects;
@@ -26,6 +29,7 @@ public class Host implements IDatabaseEntry<Long> {
 	private int port;
 
 	private String username;
+	@JdbcTypeCode(SqlTypes.LONG32VARCHAR)
 	private String privateKey;
 
 	public Host(HostCreateRequest request) {

@@ -44,3 +44,4 @@ bin/
 .idea
 config/database_config.json
 .env
+id_rsa*

@@ -103,16 +103,4 @@ public class Workspace implements IDatabaseEntry<Long> {
 		return id;
 	}
 
-	@Override
-	public void save() {
-		IDatabaseEntry.super.save();
-
-		for (Host host : hosts) {
-			host.save();
-		}
-
-		for (WorkspacePermission permission : permissions) {
-			permission.save();
-		}
-	}
 }

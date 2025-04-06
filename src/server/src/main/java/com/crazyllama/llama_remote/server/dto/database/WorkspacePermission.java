@@ -48,10 +48,4 @@ public class WorkspacePermission implements IDatabaseEntry<Long> {
 		result = 31 * result + Objects.hashCode(host);
 		return result;
 	}
-
-	@Override
-	public void save() {
-		this.user.save();
-		this.host.save();
-	}
 }

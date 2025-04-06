@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   llama_mariadb:
     image: mariadb:11.6.2
@@ -10,4 +12,35 @@ services:
     ports:
       - "${DATABASE_PORT}:3306"
 
+  ubuntu_host1:
+    build:
+      context: ./ubuntu_ssh
+      dockerfile: Dockerfile
+    container_name: ubuntu_host1
+    restart: unless-stopped
+    ports:
+      - "2221:22"
+    volumes:
+      - ./pub.1:/root/.ssh/authorized_keys
 
+  ubuntu_host2:
+    build:
+      context: ./ubuntu_ssh
+      dockerfile: Dockerfile
+    container_name: ubuntu_host2
+    restart: unless-stopped
+    ports:
+      - "2222:22"
+    volumes:
+      - ./pub.2:/root/.ssh/authorized_keys
+
+  ubuntu_host3:
+    build:
+      context: ./ubuntu_ssh
+      dockerfile: Dockerfile
+    container_name: ubuntu_host3
+    restart: unless-stopped
+    ports:
+      - "2223:22"
+    volumes:
+      - ./pub.3:/root/.ssh/authorized_keys
