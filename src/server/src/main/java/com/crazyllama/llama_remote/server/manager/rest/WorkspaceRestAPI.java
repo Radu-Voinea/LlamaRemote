@@ -1,10 +1,13 @@
 package com.crazyllama.llama_remote.server.manager.rest;
 
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceAddUserRequest;
 import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceCreateRequest;
 import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceInfoRequest;
 import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceListRequest;
+import com.crazyllama.llama_remote.server.dto.database.Host;
 import com.crazyllama.llama_remote.server.dto.database.User;
 import com.crazyllama.llama_remote.server.dto.database.Workspace;
+import com.crazyllama.llama_remote.server.dto.database.WorkspacePermission;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -95,6 +98,57 @@ public class WorkspaceRestAPI {
 
 		return ResponseEntity.ok(
 				new WorkspaceInfoRequest.Response("OK", workspace.getName())
+		);
+	}
+
+	@PostMapping("/workspace/{id}/add_user")
+	public ResponseEntity<WorkspaceAddUserRequest.Response> addUser(
+			@RequestHeader("Authorization") String authHeader,
+			@PathVariable("id") int id,
+			@RequestBody WorkspaceAddUserRequest body
+	) {
+		User user = User.getByAuthHeader(authHeader);
+
+		if (user == null) {
+			return ResponseEntity.status(401)
+					.body(new WorkspaceAddUserRequest.Response("Unauthorised"));
+		}
+
+		Workspace workspace = Workspace.getById(id);
+
+		if (workspace == null) {
+			return ResponseEntity.status(404)
+					.body(new WorkspaceAddUserRequest.Response("Workspace not found"));
+		}
+
+		if (!workspace.hasPermission(user)) {
+			return ResponseEntity.status(403)
+					.body(new WorkspaceAddUserRequest.Response("Forbidden"));
+		}
+
+		User targetUser = User.getByUsername(body.username);
+
+		if (targetUser == null) {
+			return ResponseEntity.status(404)
+					.body(new WorkspaceAddUserRequest.Response("User not found"));
+		}
+
+
+		for (Long hostID : body.hostIDs) {
+			Host host = workspace.getHostById(hostID);
+
+			if (host == null) {
+				continue;
+			}
+
+			WorkspacePermission permission = new WorkspacePermission(user, host);
+			workspace.addPermission(permission);
+		}
+
+		workspace.save();
+
+		return ResponseEntity.ok(
+				new WorkspaceAddUserRequest.Response("OK")
 		);
 	}
 
