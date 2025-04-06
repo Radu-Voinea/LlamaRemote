@@ -7,7 +7,6 @@ import com.intellij.openapi.wm.ToolWindowManager;
 import com.intellij.terminal.ui.TerminalWidget;
 import com.intellij.ui.content.Content;
 import com.intellij.ui.content.ContentFactory;
-import com.jediterm.terminal.TtyConnector;
 import lombok.Getter;
 import lombok.SneakyThrows;
 import lombok.experimental.Accessors;
@@ -22,14 +21,11 @@ import java.lang.reflect.Method;
 
 public class TerminalWindowFactory implements ToolWindowFactory {
 
+	private static final Class<?> terminalWidgetClass;
+	private static final Method widgetMethod;
 	@Getter
 	@Accessors(fluent = true)
 	private static TerminalWindowFactory instance;
-
-	private String lastBuffer = "";
-
-	private static final Class<?> terminalWidgetClass;
-	private static final Method widgetMethod;
 
 	static {
 		try {
@@ -41,6 +37,7 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 		}
 	}
 
+	private String lastBuffer = "";
 	private ToolWindow terminalToolWindow;
 	private ShellTerminalWidget shellTerminalWidget;
 	private TerminalWidget terminalWidget;
@@ -56,9 +53,9 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 	public void createToolWindowContent(@NotNull Project project, @NotNull ToolWindow toolWindow) {
 		this.terminalToolWindow = ToolWindowManager.getInstance(project).getToolWindow("Llama Terminal");
 
-		this. terminalManager = TerminalToolWindowManager.getInstance(project);
-		this. terminalWidget = terminalManager.createShellWidget(null, null, false, true);
-		this. shellTerminalWidget = (ShellTerminalWidget) widgetMethod.invoke(terminalWidget);
+		this.terminalManager = TerminalToolWindowManager.getInstance(project);
+		this.terminalWidget = terminalManager.createShellWidget(null, null, false, true);
+		this.shellTerminalWidget = (ShellTerminalWidget) widgetMethod.invoke(terminalWidget);
 
 		shellTerminalWidget.getTerminalPanel().addPreKeyEventHandler((event) -> {
 			if (event.getExtendedKeyCode() == KeyEvent.VK_ENTER) {
@@ -90,6 +87,10 @@ public class TerminalWindowFactory implements ToolWindowFactory {
 	}
 
 	public void focus() {
+		if (terminalToolWindow == null) {
+			createToolWindowContent(LLamaWindowFactory.project, LLamaWindowFactory.toolWindow);
+		}
+
 		terminalToolWindow.activate(() -> {
 		});
 	}
