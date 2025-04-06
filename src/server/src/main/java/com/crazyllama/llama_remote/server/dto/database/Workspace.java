@@ -57,8 +57,6 @@ public class Workspace implements IDatabaseEntry<Long> {
 	}
 
 	public boolean hasPermission(User user) {
-		System.out.println(user);
-		System.out.println(this.owner);
 		return this.permissions.stream().anyMatch(permission -> permission.getUser().equals(user)) || this.owner.equals(user);
 	}
 

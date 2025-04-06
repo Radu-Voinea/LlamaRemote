@@ -42,6 +42,28 @@ public class WorkspaceRestAPI {
 		);
 	}
 
+	@GetMapping("/workspace/list_owner")
+	public ResponseEntity<WorkspaceListRequest.Response> listOwner(@RequestHeader("Authorization") String authHeader) {
+		User user = User.getByAuthHeader(authHeader);
+
+		if (user == null) {
+			return ResponseEntity.status(401)
+					.body(new WorkspaceListRequest.Response("Unauthorised", new ArrayList<>()));
+		}
+
+		List<Workspace> workspaces = Workspace.getByUser(user);
+
+		return ResponseEntity.ok(
+				new WorkspaceListRequest.Response(
+						"OK",
+						workspaces.stream()
+								.filter(workspace -> workspace.getOwner().equals(user))
+								.map(Workspace::getIdentifier)
+								.toList()
+				)
+		);
+	}
+
 
 	@PostMapping("/workspace/create")
 	public ResponseEntity<WorkspaceCreateRequest.Response> create(
