@@ -94,6 +94,10 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		JButton headerButton = createEntryButton(collapsedPrefix + title);
 		headerButton.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+		JButton addNewUserButton = createEntryButton("Add new user");
+		addNewUserButton.setAlignmentX(Component.RIGHT_ALIGNMENT);
+		addNewUserButton.addActionListener((e) -> AddNewUserButtonPressed(e, workspaceID));
+
 		JPanel dropdownPanel = new JPanel();
 		dropdownPanel.setLayout(new BoxLayout(dropdownPanel, BoxLayout.Y_AXIS));
 		dropdownPanel.setBorder(BorderFactory.createEmptyBorder(0, 20, 10, 0));
@@ -125,6 +129,7 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		headerButton.addActionListener(toggleDropdown);
 
 		headerPanel.add(headerButton);
+		headerPanel.add(addNewUserButton);
 		sectionPanel.add(headerPanel);
 		sectionPanel.add(dropdownPanel);
 		parent.add(sectionPanel);
@@ -139,6 +144,10 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		button.setAlignmentX(Component.LEFT_ALIGNMENT);
 
 		return button;
+	}
+
+	private void AddNewUserButtonPressed(ActionEvent e, Long workspaceID) {
+		LLamaWindowFactory.instance.updateToolWindowContent(new AddUserPanel(workspaceID));
 	}
 
 	private void AddNewHostButtonPressed(ActionEvent e, Long workspaceID) {

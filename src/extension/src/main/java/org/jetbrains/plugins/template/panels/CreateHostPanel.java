@@ -10,7 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 
 public class CreateHostPanel extends JPanel {
-	private final Long workspace_id;
+	private final long workspace_id;
 
 	private final JTextField nameField;
 	private final JTextField hostField;
