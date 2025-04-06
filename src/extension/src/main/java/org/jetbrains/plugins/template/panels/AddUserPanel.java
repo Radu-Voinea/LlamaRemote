@@ -3,7 +3,9 @@ package org.jetbrains.plugins.template.panels;
 
 import com.crazyllama.llama_remote.common.dto.rest.host.HostInfoRequest;
 import com.crazyllama.llama_remote.common.dto.rest.host.HostsListRequest;
-import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceListRequest;
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceAddUserRequest;
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceCreateRequest;
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceGetUsersRequest;
 import com.intellij.util.ui.JBUI;
 import com.raduvoinea.utils.message_builder.MessageBuilder;
 import lombok.Getter;
@@ -20,20 +22,21 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-
-import static org.jetbrains.plugins.template.api.WorkspaceAPI.getWorkspaceName;
+import java.util.Map;
 
 public class AddUserPanel extends JPanel {
 	private final long workspace_id;
-
-	private List<Long> workspaceIDList;
-	private String[] workspaceOptions;
-	private JComboBox<String> workspaceCombo;
+	private final JTextField usernameField;
+	private final Map<String, Long> hostNameToID = new HashMap<>();
+	private JList<String> userList;
+	private MultiCheckComboBoxNoClose hostsCombo;
 
 	public AddUserPanel(long workspace_id) {
 		super(new BorderLayout());
 		this.workspace_id = workspace_id;
+
 		this.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
 		JPanel formPanel = new JPanel(new GridBagLayout());
@@ -41,26 +44,26 @@ public class AddUserPanel extends JPanel {
 		gbc.insets = JBUI.insets(5);
 		gbc.fill = GridBagConstraints.HORIZONTAL;
 
+		gbc.gridy = 1;
 		gbc.gridx = 0;
-		gbc.gridy = 0;
-		JLabel workspaceLabel = new JLabel("Workspaces:");
-		formPanel.add(workspaceLabel, gbc);
 
-		gbc.gridx = 1;
+		JPanel userListPanel = new JPanel(new BorderLayout());
+		userListPanel.setBorder(BorderFactory.createTitledBorder("Current Users"));
 
-		getWorkspaces();
-		getWorkspacesNames();
-		workspaceCombo = new JComboBox<>(workspaceOptions);
-		workspaceCombo.setPreferredSize(new Dimension(150, workspaceCombo.getPreferredSize().height));
-		formPanel.add(workspaceCombo, gbc);
+		String[] currentUsers = getUsersForWorkspace();
+		userList = new JList<>(currentUsers);
+		userList.setVisibleRowCount(5); // adjust as needed
+		userListPanel.add(new JScrollPane(userList), BorderLayout.CENTER);
 
-		gbc.gridy++;
-		gbc.gridx = 0;
+// Add above the formPanel
+		this.add(userListPanel, BorderLayout.NORTH);
+
+
 		JLabel usernameLabel = new JLabel("Username:");
 		formPanel.add(usernameLabel, gbc);
 
 		gbc.gridx = 1;
-		JTextField usernameField = new JTextField();
+		usernameField = new JTextField();
 		usernameField.setPreferredSize(new Dimension(150, usernameField.getPreferredSize().height));
 		formPanel.add(usernameField, gbc);
 
@@ -70,20 +73,15 @@ public class AddUserPanel extends JPanel {
 		formPanel.add(hostsLabel, gbc);
 
 		gbc.gridx = 1;
-		MultiCheckComboBoxNoClose.CheckComboBoxItem[] hostItems = {
-				new MultiCheckComboBoxNoClose.CheckComboBoxItem("Host 1", false),
-				new MultiCheckComboBoxNoClose.CheckComboBoxItem("Host 2", false),
-				new MultiCheckComboBoxNoClose.CheckComboBoxItem("Host 3", false),
-				new MultiCheckComboBoxNoClose.CheckComboBoxItem("Host 4", false)
-		};
-		MultiCheckComboBoxNoClose hostsCombo = new MultiCheckComboBoxNoClose(hostItems);
-		hostsCombo.setPreferredSize(new Dimension(150, hostsCombo.getPreferredSize().height));
+		getHostsNames();
+		createHostsCombo();
 		formPanel.add(hostsCombo, gbc);
 
 		this.add(formPanel, BorderLayout.CENTER);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		JButton saveButton = new JButton("Save");
+		saveButton.addActionListener(this::saveButtonPressed);
 
 		JButton cancelButton = new JButton("Cancel");
 		cancelButton.addActionListener(this::cancelButtonPressed);
@@ -92,59 +90,89 @@ public class AddUserPanel extends JPanel {
 		buttonPanel.add(saveButton);
 		this.add(buttonPanel, BorderLayout.SOUTH);
 
-		saveButton.addActionListener(e -> {
-			String selectedWorkspace = (String) workspaceCombo.getSelectedItem();
-			String username = usernameField.getText();
-			java.util.List<String> selectedHosts = hostsCombo.getSelectedItems();
-
-			System.out.println("Saved workspace: " + selectedWorkspace);
-			System.out.println("Saved username: " + username);
-			System.out.println("Saved hosts: " + selectedHosts);
-		});
 	}
 
 	private void cancelButtonPressed(ActionEvent e) {
 		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
 	}
 
-	private void getWorkspacesNames() {
-		workspaceOptions = new String[workspaceIDList.size()];
-
-		int index = 0;
-		for (Long id : workspaceIDList) {
-			workspaceOptions[index] = getWorkspaceName(id);
+	private void saveButtonPressed(ActionEvent e) {
+		String username = usernameField.getText();
+		List<String> selectedHosts = hostsCombo.getSelectedItems();
+		List<Long> hostsIDs = new ArrayList<>(selectedHosts.size());
+		for (String selectedHost : selectedHosts) {
+			hostsIDs.add(hostNameToID.get(selectedHost));
 		}
-	}
 
-	private void getWorkspaces() {
-		WorkspaceListRequest.Response response = new APIRequest<>("/workspace/list_owner", "GET",
-				null, WorkspaceListRequest.Response.class)
+
+		WorkspaceGetUsersRequest.Response before = new APIRequest<>(
+				new MessageBuilder("/workspace/{id}/get_users")
+						.parse("id", workspace_id)
+						.parse()
+				, "GET",
+				null, WorkspaceGetUsersRequest.Response.class)
 				.getResponse();
 
-		System.out.println("RESPONSE: " + response);
-		System.out.println("RESPONSEsd: " + response.response);
+		System.out.println("BEFORE ADD USER " + before.usernames);
 
-		workspaceIDList = response.workspaces;
+		WorkspaceAddUserRequest request = new WorkspaceAddUserRequest(username, hostsIDs);
+
+		WorkspaceCreateRequest.Response response = new APIRequest<>(
+				new MessageBuilder("/workspace/{id}/add_user")
+						.parse("id", workspace_id)
+						.parse()
+				, "POST",
+				request, WorkspaceCreateRequest.Response.class)
+				.getResponse();
+
+		System.out.println("RESPONSE ADD USER " + response);
+		System.out.println("RESPONSE ADD USER " + response.response);
+
+		WorkspaceGetUsersRequest.Response eqweq = new APIRequest<>(
+				new MessageBuilder("/workspace/{id}/get_users")
+						.parse("id", workspace_id)
+						.parse()
+				, "GET",
+				null, WorkspaceGetUsersRequest.Response.class)
+				.getResponse();
+
+		System.out.println("AFTER ADD USER " + eqweq.usernames);
+
+
+		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
+
 	}
 
-	private String[] getHostsNames(Long workspaceID) {
+	private String[] getUsersForWorkspace() {
+		WorkspaceGetUsersRequest.Response response = new APIRequest<>(
+				new MessageBuilder("/workspace/{id}/get_users")
+						.parse("id", workspace_id)
+						.parse()
+				, "GET",
+				null, WorkspaceGetUsersRequest.Response.class)
+				.getResponse();
+
+		String[] users = new String[response.usernames.size()];
+		int index = 0;
+		for (String username : response.usernames) {
+			users[index] = username;
+		}
+
+		return users;
+	}
+
+	private void getHostsNames() {
 		HostsListRequest.Response response = new APIRequest<>(
 				new MessageBuilder("/host/{workspace}/list")
-						.parse("workspace", workspaceID)
+						.parse("workspace", workspace_id)
 						.parse()
 				, "GET", null, HostsListRequest.Response.class)
 				.getResponse();
 
-		if (response.hosts == null) {
-			return new String[0];
-		}
-
-		String[] toReturn = new String[response.hosts.size()];
-		int index = 0;
 		for (Long host : response.hosts) {
 			HostInfoRequest.Response infoResponse = new APIRequest<>(
 					new MessageBuilder("/host/{workspace}/{host}")
-							.parse("workspace", workspaceID)
+							.parse("workspace", workspace_id)
 							.parse("host", host)
 							.parse(),
 					"GET", null, HostInfoRequest.Response.class
@@ -154,11 +182,21 @@ public class AddUserPanel extends JPanel {
 				System.out.println("GET HOME INFO REQUEST FAILED FOR " + host);
 				continue;
 			}
-			toReturn[index] = infoResponse.name;
+
+			hostNameToID.put(infoResponse.name, host);
 		}
+	}
 
+	private void createHostsCombo() {
+		MultiCheckComboBoxNoClose.CheckComboBoxItem[] hostItems = new MultiCheckComboBoxNoClose.CheckComboBoxItem[hostNameToID.size()];
 
-		return toReturn;
+		int index = 0;
+		for (String hostname : hostNameToID.keySet()) {
+			hostItems[index] = new MultiCheckComboBoxNoClose.CheckComboBoxItem(hostname, false);
+		}
+		hostsCombo = new MultiCheckComboBoxNoClose(hostItems);
+
+		hostsCombo.setPreferredSize(new Dimension(150, hostsCombo.getPreferredSize().height));
 	}
 
 	private class MultiCheckComboBoxNoClose extends JComboBox<MultiCheckComboBoxNoClose.CheckComboBoxItem> {
@@ -167,15 +205,6 @@ public class AddUserPanel extends JPanel {
 			super(items);
 			setRenderer(new CheckComboRenderer());
 			updateUI();
-			refreshHosts();
-		}
-
-		private void refreshHosts() {
-			removeAllItems(); // Clear old items
-			String[] hostNames = getHostsNames(workspaceIDList.get(workspaceCombo.getSelectedIndex()));
-			for (String name : hostNames) {
-				addItem(new CheckComboBoxItem(name, false));
-			}
 		}
 
 		@Override
@@ -224,7 +253,6 @@ public class AddUserPanel extends JPanel {
 			this.addPopupMenuListener(new PopupMenuListener() {
 				@Override
 				public void popupMenuWillBecomeVisible(PopupMenuEvent e) {
-					refreshHosts();
 				}
 
 				@Override

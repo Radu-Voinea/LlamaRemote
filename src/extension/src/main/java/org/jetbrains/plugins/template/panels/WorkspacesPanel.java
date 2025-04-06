@@ -2,6 +2,7 @@ package org.jetbrains.plugins.template.panels;
 
 import com.crazyllama.llama_remote.common.dto.rest.host.HostInfoRequest;
 import com.crazyllama.llama_remote.common.dto.rest.host.HostsListRequest;
+import com.crazyllama.llama_remote.common.dto.rest.workspace.WorkspaceListRequest;
 import com.raduvoinea.utils.message_builder.MessageBuilder;
 import org.jetbrains.plugins.template.api.APIRequest;
 import org.jetbrains.plugins.template.api.WorkspaceAPI;
@@ -147,7 +148,13 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 	}
 
 	private void AddNewUserButtonPressed(ActionEvent e, Long workspaceID) {
-		LLamaWindowFactory.instance.updateToolWindowContent(new AddUserPanel(workspaceID));
+		WorkspaceListRequest.Response response = new APIRequest<>("/workspace/list_owner", "GET",
+				null, WorkspaceListRequest.Response.class)
+				.getResponse();
+
+		if (response.workspaces.contains(workspaceID)) {
+			LLamaWindowFactory.instance.updateToolWindowContent(new AddUserPanel(workspaceID));
+		}
 	}
 
 	private void AddNewHostButtonPressed(ActionEvent e, Long workspaceID) {
