@@ -64,6 +64,7 @@ public class CreateWorkspacePanel extends JPanel {
 		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
 	}
 
+	// TODO: Check for name is ""
 	private void saveButtonPressed(ActionEvent e) {
 		String name = nameField.getText();
 		WorkspaceCreateRequest request = new WorkspaceCreateRequest(name);
