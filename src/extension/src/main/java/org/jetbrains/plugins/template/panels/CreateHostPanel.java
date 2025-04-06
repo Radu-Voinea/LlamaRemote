@@ -115,13 +115,23 @@ public class CreateHostPanel extends JPanel {
 		this.add(scrollPane, BorderLayout.CENTER);
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+
 		JButton saveButton = new JButton("Save");
-		saveButton.addActionListener(this::SaveButtonPressed);
+		saveButton.addActionListener(this::saveButtonPressed);
+
+		JButton cancelButton = new JButton("Cancel");
+		cancelButton.addActionListener(this::cancelButtonPressed);
+
+		buttonPanel.add(cancelButton);
 		buttonPanel.add(saveButton);
 		this.add(buttonPanel, BorderLayout.SOUTH);
 	}
 
-	private void SaveButtonPressed(ActionEvent e) {
+	private void cancelButtonPressed(ActionEvent e) {
+		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
+	}
+
+	private void saveButtonPressed(ActionEvent e) {
 		String portString = portField.getText();
 		int port;
 		try {
@@ -143,6 +153,10 @@ public class CreateHostPanel extends JPanel {
 				request, HostCreateRequest.Response.class)
 				.getResponse();
 
+		System.out.println("Response " + response.response);
+
 		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
 	}
+
+
 }
