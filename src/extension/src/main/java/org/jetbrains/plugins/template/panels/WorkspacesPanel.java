@@ -22,7 +22,7 @@ import java.util.Map;
 public class WorkspacesPanel extends JScrollPane implements IRefreshableComponent {
 
 	private final JPanel contentPanel;
-	private final Map<String, Long> hostNameToId = new HashMap<>();
+	private Map<String, Long> hostNameToId;
 
 	public WorkspacesPanel() {
 		super(null,
@@ -54,6 +54,8 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 	}
 
 	private void getHosts(Long workspaceID) {
+		hostNameToId = new HashMap<>();
+
 		HostsListRequest.Response response = new APIRequest<>(
 				new MessageBuilder("/host/{workspace}/list")
 						.parse("workspace", workspaceID)
