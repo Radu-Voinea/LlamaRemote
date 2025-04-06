@@ -36,6 +36,7 @@ public class APIRequest<RequestBody, ResponseBody> {
 	public ResponseBody getResponse() {
 		try (HttpClient httpClient = HttpClient.newHttpClient()) {
 			HttpResponse<String> httpResponse = httpClient.send(this.httpRequest, HttpResponse.BodyHandlers.ofString());
+			System.out.println(httpResponse);
 			return LLamaRemote.instance().getGson().fromJson(httpResponse.body(), this.responseClass);
 		} catch (Exception exception) {
 			exception.printStackTrace();

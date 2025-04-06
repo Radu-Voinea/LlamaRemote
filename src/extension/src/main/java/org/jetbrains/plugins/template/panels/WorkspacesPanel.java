@@ -33,7 +33,7 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		for (Long workspaceID : WorkspaceAPI.getWorkspaces()) {
 			String workspaceName = WorkspaceAPI.getWorkspaceName(workspaceID);
 
-			addExpandableSection(contentPanel, workspaceName, getHostsNames(workspaceID));
+			addExpandableSection(contentPanel, workspaceName, workspaceID, getHostsNames(workspaceID));
 		}
 
 		JButton addWorkspaceButton = new JButton("Add new workspace");
@@ -52,7 +52,7 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 				, "GET", null, HostsListRequest.Response.class)
 				.getResponse();
 
-		if(response.hosts == null){
+		if (response.hosts == null) {
 			return new String[0];
 		}
 
@@ -78,7 +78,7 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		return toReturn;
 	}
 
-	private void addExpandableSection(JPanel parent, String title, String[] items) {
+	private void addExpandableSection(JPanel parent, String title, Long workspaceID, String[] items) {
 		JPanel sectionPanel = new JPanel();
 		sectionPanel.setLayout(new BoxLayout(sectionPanel, BoxLayout.Y_AXIS));
 		sectionPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -107,7 +107,7 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 
 		JButton addHostButton = new JButton("Add new host");
 		addHostButton.setAlignmentX(Component.LEFT_ALIGNMENT);
-		addHostButton.addActionListener(this::AddNewHostButtonPressed);
+		addHostButton.addActionListener((e) -> AddNewHostButtonPressed(e, workspaceID));
 		dropdownPanel.add(addHostButton);
 
 		Action toggleDropdown = new AbstractAction() {
@@ -141,8 +141,8 @@ public class WorkspacesPanel extends JScrollPane implements IRefreshableComponen
 		return button;
 	}
 
-	private void AddNewHostButtonPressed(ActionEvent e) {
-		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
+	private void AddNewHostButtonPressed(ActionEvent e, Long workspaceID) {
+		LLamaWindowFactory.instance.updateToolWindowContent(new CreateHostPanel(workspaceID));
 	}
 
 	private void AddNewWorkspaceButtonPressed(ActionEvent e) {

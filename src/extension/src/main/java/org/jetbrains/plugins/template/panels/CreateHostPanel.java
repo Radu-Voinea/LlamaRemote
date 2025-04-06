@@ -1,12 +1,26 @@
 package org.jetbrains.plugins.template.panels;
 
+import com.crazyllama.llama_remote.common.dto.rest.host.HostCreateRequest;
+import org.jetbrains.plugins.template.api.APIRequest;
+import org.jetbrains.plugins.template.toolWindow.LLamaWindowFactory;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 
 public class CreateHostPanel extends JPanel {
+	private final Long workspace_id;
 
-	public CreateHostPanel() {
+	private final JTextField nameField;
+	private final JTextField hostField;
+	private final JTextField portField;
+	private final JTextField usernameField;
+	private final JTextArea privateKeyArea;
+
+	public CreateHostPanel(Long workspace_id) {
 		super(new BorderLayout());
+
+		this.workspace_id = workspace_id;
 
 		JPanel pictogramPanel = new JPanel();
 		pictogramPanel.setLayout(new BoxLayout(pictogramPanel, BoxLayout.Y_AXIS));
@@ -19,6 +33,7 @@ public class CreateHostPanel extends JPanel {
 		));
 		workspacePanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
+		// TODO: Should this be a placeholder?
 		JLabel titleLabel = new JLabel("Workspace");
 		titleLabel.setFont(titleLabel.getFont().deriveFont(Font.BOLD));
 		titleLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -29,7 +44,7 @@ public class CreateHostPanel extends JPanel {
 		nameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		workspacePanel.add(nameLabel);
 
-		JTextField nameField = new JTextField();
+		nameField = new JTextField();
 		nameField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		Dimension namePrefSize = nameField.getPreferredSize();
 		nameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, namePrefSize.height));
@@ -40,7 +55,7 @@ public class CreateHostPanel extends JPanel {
 		hostLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		workspacePanel.add(hostLabel);
 
-		JTextField hostField = new JTextField();
+		hostField = new JTextField();
 		hostField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		Dimension hostPrefSize = hostField.getPreferredSize();
 		hostField.setMaximumSize(new Dimension(Integer.MAX_VALUE, hostPrefSize.height));
@@ -51,7 +66,7 @@ public class CreateHostPanel extends JPanel {
 		portLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		workspacePanel.add(portLabel);
 
-		JTextField portField = new JTextField();
+		portField = new JTextField();
 		portField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		Dimension portPrefSize = portField.getPreferredSize();
 		portField.setMaximumSize(new Dimension(Integer.MAX_VALUE, portPrefSize.height));
@@ -62,7 +77,7 @@ public class CreateHostPanel extends JPanel {
 		usernameLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		workspacePanel.add(usernameLabel);
 
-		JTextField usernameField = new JTextField();
+		usernameField = new JTextField();
 		usernameField.setAlignmentX(Component.LEFT_ALIGNMENT);
 		Dimension userPrefSize = usernameField.getPreferredSize();
 		usernameField.setMaximumSize(new Dimension(Integer.MAX_VALUE, userPrefSize.height));
@@ -73,7 +88,7 @@ public class CreateHostPanel extends JPanel {
 		pkLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		workspacePanel.add(pkLabel);
 
-		JTextArea privateKeyArea = new JTextArea(6, 20);
+		privateKeyArea = new JTextArea(6, 20);
 		privateKeyArea.setLineWrap(true);
 		privateKeyArea.setWrapStyleWord(true);
 		privateKeyArea.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -100,8 +115,35 @@ public class CreateHostPanel extends JPanel {
 
 		JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		JButton saveButton = new JButton("Save");
+		saveButton.addActionListener(this::SaveButtonPressed);
 		buttonPanel.add(saveButton);
 		this.add(buttonPanel, BorderLayout.SOUTH);
 	}
 
+	private void SaveButtonPressed(ActionEvent e) {
+		String portString = portField.getText();
+		int port;
+		try {
+			port = Integer.parseInt(portString);
+		} catch (NumberFormatException ex) {
+			throw new RuntimeException(ex);
+		}
+
+		String name = nameField.getText();
+		String host = hostField.getText();
+		String username = usernameField.getText();
+		String privateKey = privateKeyArea.getText();
+		HostCreateRequest request = new HostCreateRequest(workspace_id, name, host, port, username, privateKey);
+
+		System.out.println("HOST CREATE REQUEST " + request);
+
+
+		HostCreateRequest.Response response = new APIRequest<>("/host/create", "POST",
+				request, HostCreateRequest.Response.class)
+				.getResponse();
+
+		System.out.println("HOST CREATE REQUEST " + response);
+
+		LLamaWindowFactory.instance.updateToolWindowContent(new WorkspacesPanel());
+	}
 }
