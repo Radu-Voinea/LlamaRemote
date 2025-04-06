@@ -30,7 +30,6 @@ public class AddUserPanel extends JPanel {
 	private final long workspace_id;
 	private final JTextField usernameField;
 	private final Map<String, Long> hostNameToID = new HashMap<>();
-	private JList<String> userList;
 	private MultiCheckComboBoxNoClose hostsCombo;
 
 	public AddUserPanel(long workspace_id) {
@@ -51,7 +50,7 @@ public class AddUserPanel extends JPanel {
 		userListPanel.setBorder(BorderFactory.createTitledBorder("Current Users"));
 
 		String[] currentUsers = getUsersForWorkspace();
-		userList = new JList<>(currentUsers);
+		JList<String> userList = new JList<>(currentUsers);
 		userList.setVisibleRowCount(5); // adjust as needed
 		userListPanel.add(new JScrollPane(userList), BorderLayout.CENTER);
 
@@ -200,7 +199,7 @@ public class AddUserPanel extends JPanel {
 		hostsCombo.setPreferredSize(new Dimension(150, hostsCombo.getPreferredSize().height));
 	}
 
-	private class MultiCheckComboBoxNoClose extends JComboBox<MultiCheckComboBoxNoClose.CheckComboBoxItem> {
+	private static class MultiCheckComboBoxNoClose extends JComboBox<MultiCheckComboBoxNoClose.CheckComboBoxItem> {
 
 		public MultiCheckComboBoxNoClose(CheckComboBoxItem[] items) {
 			super(items);
@@ -240,7 +239,6 @@ public class AddUserPanel extends JPanel {
 							public void mouseClicked(MouseEvent e) {
 								int index = finalList.locationToIndex(e.getPoint());
 								if (index >= 0) {
-									@SuppressWarnings("unchecked")
 									CheckComboBoxItem item = (CheckComboBoxItem) finalList.getModel().getElementAt(index);
 									item.setSelected(!item.isSelected());
 									finalList.repaint();
